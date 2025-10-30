@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: testing
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pcntl, pdo_mysql
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          cp .env.example .env
+          composer install --no-interaction --prefer-dist
+          php artisan key:generate
+
+      - name: Configure database
+        run: |
+          php -r "file_put_contents('.env', str_replace(['DB_CONNECTION=sqlite', 'DB_DATABASE'], ['DB_CONNECTION=mysql', 'DB_DATABASE=testing'], file_get_contents('.env')));"
+          php -r "file_put_contents('.env', str_replace(['DB_USERNAME=root', 'DB_PASSWORD='], ['DB_USERNAME=user', 'DB_PASSWORD=password'], file_get_contents('.env')));"
+          php artisan migrate --no-interaction -vvv
+
+      - name: Run tests
+        run: |
+          php artisan test --without-tty -v
+
+
