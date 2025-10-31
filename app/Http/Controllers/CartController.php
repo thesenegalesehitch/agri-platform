@@ -18,10 +18,15 @@ class CartController extends Controller
         return view('cart.index', ['cart' => $cart]);
     }
 
-    public function add(Product $product)
+    public function add(Product $product, Request $request)
     {
+        $request->validate([
+            'quantity' => ['nullable','integer','min:1','max:100']
+        ]);
+
         $cart = session('cart', []);
-        $cart[$product->id] = ($cart[$product->id] ?? 0) + 1;
+        $qty = $request->integer('quantity', 1);
+        $cart[$product->id] = ($cart[$product->id] ?? 0) + $qty;
         session(['cart' => $cart]);
         return back()->with('status', 'Produit ajouté au panier');
     }
@@ -50,8 +55,7 @@ class CartController extends Controller
             $total = 0;
             foreach ($cart as $productId => $qty) {
                 $product = Product::findOrFail($productId);
-                $qty = min($qty, $product->stock);
-                if ($qty <= 0) continue;
+                $qty = max(1, min(max(1, $qty), $product->stock));
                 $lineTotal = $qty * $product->price;
                 OrderItem::create([
                     'order_id' => $order->id,

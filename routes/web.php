@@ -16,21 +16,32 @@ Route::get('/about', function () { return view('about'); })->name('about');
 Route::get('/contact', function () { return view('contact'); })->name('contact');
 Route::get('/support', function () { return view('support'); })->name('support');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+// Routes publiques pour voir les produits et équipements
+Route::get('products', [ProductController::class, 'index'])->name('products.index');
+Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('equipment', [EquipmentController::class, 'index'])->name('equipment.index');
+Route::get('equipment/{equipment}', [EquipmentController::class, 'show'])->name('equipment.show');
+
+// Routes d'autocomplétion (publiques)
+Route::get('api/search/products', [\App\Http\Controllers\SearchController::class, 'autocompleteProducts'])->name('api.search.products');
+Route::get('api/search/equipment', [\App\Http\Controllers\SearchController::class, 'autocompleteEquipment'])->name('api.search.equipment');
+Route::get('api/search/locations', [\App\Http\Controllers\SearchController::class, 'autocompleteLocations'])->name('api.search.locations');
+
+Route::middleware(['auth', 'verified', 'suspended'])->group(function () {
 	Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 	// Producer
 	Route::middleware([
 		\Spatie\Permission\Middleware\RoleMiddleware::class.':producer'
 	])->group(function () {
-		Route::resource('products', ProductController::class);
+		Route::resource('products', ProductController::class)->except(['index', 'show']);
 	});
 
 	// Equipment owner
 	Route::middleware([
 		\Spatie\Permission\Middleware\RoleMiddleware::class.':equipment_owner'
 	])->group(function () {
-		Route::resource('equipment', EquipmentController::class);
+		Route::resource('equipment', EquipmentController::class)->except(['index', 'show']);
 		Route::resource('rentals', RentalController::class)->only(['index','show','update']);
 	});
 
@@ -64,6 +75,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 		Route::resource('/admin/users', UserManagementController::class)->names('admin.users');
 		Route::patch('/admin/users/{user}/suspend', [DashboardController::class, 'suspend'])->name('admin.users.suspend');
 		Route::patch('/admin/users/{user}/reactivate', [DashboardController::class, 'reactivate'])->name('admin.users.reactivate');
+		
+		// Vérification CNI
+		Route::get('/admin/cni', [\App\Http\Controllers\Admin\CniVerificationController::class, 'index'])->name('admin.cni.index');
+		Route::get('/admin/cni/{user}', [\App\Http\Controllers\Admin\CniVerificationController::class, 'show'])->name('admin.cni.show');
+		Route::post('/admin/cni/{user}/approve', [\App\Http\Controllers\Admin\CniVerificationController::class, 'approve'])->name('admin.cni.approve');
+		Route::post('/admin/cni/{user}/reject', [\App\Http\Controllers\Admin\CniVerificationController::class, 'reject'])->name('admin.cni.reject');
+		
+		// Demandes de suspension/réactivation (gestion admin)
 		Route::patch('/admin/suspension-requests/{suspensionRequest}/approve', [SuspensionRequestController::class, 'approve'])->name('admin.suspensions.approve');
 		Route::patch('/admin/suspension-requests/{suspensionRequest}/reject', [SuspensionRequestController::class, 'reject'])->name('admin.suspensions.reject');
 	});

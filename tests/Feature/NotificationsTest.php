@@ -64,3 +64,5 @@ it('sends notifications on rental create and status change', function () {
 
     Notification::assertSentTo($buyer, RentalStatusChanged::class);
 });
+
+

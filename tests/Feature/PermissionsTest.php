@@ -43,3 +43,5 @@ it('prevents non-owners from updating products and equipment', function () {
 
     expect($equipment->fresh()->title)->toBe('Moissonneuse');
 });
+
+

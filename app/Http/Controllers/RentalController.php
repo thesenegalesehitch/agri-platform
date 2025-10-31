@@ -72,8 +72,8 @@ class RentalController extends Controller
             return back()->withErrors(['dates' => 'Période indisponible']);
         }
 
-        $days = (new \Carbon\Carbon($data['start_date']))->diffInDays((new \Carbon\Carbon($data['end_date'])));
-        $total = max(1, $days) * $equipment->daily_rate;
+        $days = max(1, (new \Carbon\Carbon($data['start_date']))->diffInDays((new \Carbon\Carbon($data['end_date']))));
+        $total = max(0.01, $days * $equipment->daily_rate);
 
         $rental = Rental::create([
             'equipment_id' => $equipment->id,

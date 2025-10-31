@@ -25,19 +25,29 @@ class RolesAndTestDataSeeder extends Seeder
             Role::firstOrCreate(['name' => $roleName]);
         }
 
-        // Create sample users with detailed profiles
+        // Créer le compte admin principal
         $admin = User::firstOrCreate(
-            ['email' => 'admin@agri-platform.com'],
+            ['email' => 'nleopold931@gmail.com'],
             [
                 'name' => 'Administrateur Principal',
-                'password' => bcrypt('admin123'),
+                'password' => bcrypt('Alexandr3'),
                 'phone' => '+221 77 123 45 67',
+                'phone_verified' => true,
+                'region' => 'Dakar',
+                'ville' => 'Dakar',
                 'address_line1' => 'Dakar, Sénégal',
-                'billing_vat_number' => 'SN123456789'
+                'country' => 'Sénégal',
+                'cni_verified' => true,
+                'cni_verified_at' => now(),
+                'is_suspended' => false,
+                'email_verified_at' => now(), // Email vérifié par défaut pour admin
             ]
         );
-        $admin->assignRole('admin');
+        if (!$admin->hasRole('admin')) {
+            $admin->assignRole('admin');
+        }
 
+        // Create sample users with detailed profiles
         $buyer = User::firstOrCreate(
             ['email' => 'buyer@agri-platform.com'],
             [
@@ -48,7 +58,9 @@ class RolesAndTestDataSeeder extends Seeder
                 'billing_vat_number' => 'SN987654321'
             ]
         );
-        $buyer->assignRole('buyer');
+        if (!$buyer->hasRole('buyer')) {
+            $buyer->assignRole('buyer');
+        }
 
         $producer = User::firstOrCreate(
             ['email' => 'producer@agri-platform.com'],
@@ -61,7 +73,9 @@ class RolesAndTestDataSeeder extends Seeder
                 'farm_type' => 'Agriculture biologique'
             ]
         );
-        $producer->assignRole('producer');
+        if (!$producer->hasRole('producer')) {
+            $producer->assignRole('producer');
+        }
 
         $owner = User::firstOrCreate(
             ['email' => 'owner@agri-platform.com'],
@@ -75,6 +89,8 @@ class RolesAndTestDataSeeder extends Seeder
                 'fleet_size' => 15
             ]
         );
-        $owner->assignRole('equipment_owner');
+        if (!$owner->hasRole('equipment_owner')) {
+            $owner->assignRole('equipment_owner');
+        }
     }
 }

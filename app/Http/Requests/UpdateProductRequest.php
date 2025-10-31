@@ -18,6 +18,7 @@ class UpdateProductRequest extends FormRequest
 			'title' => ['sometimes','required','string','max:255'],
 			'description' => ['nullable','string'],
 			'price' => ['sometimes','required','numeric','min:0'],
+			'pricing_unit' => ['sometimes','required','in:per_unit,per_kilo,per_hectare,per_hour,per_day'],
 			'stock' => ['sometimes','required','integer','min:0'],
 			'is_active' => ['sometimes','boolean'],
 		];

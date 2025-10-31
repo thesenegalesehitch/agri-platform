@@ -19,16 +19,17 @@ class UpdateEquipmentRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return [
-            'category_id' => ['nullable','exists:categories,id'],
-            'title' => ['sometimes','required','string','max:255'],
-            'description' => ['nullable','string'],
-            'daily_rate' => ['sometimes','required','numeric','min:0'],
-            'is_available' => ['sometimes','boolean'],
-            'location' => ['nullable','string','max:255'],
-            'is_active' => ['sometimes','boolean'],
-        ];
-    }
+	public function rules(): array
+	{
+		return [
+			'category_id' => ['nullable','exists:categories,id'],
+			'title' => ['sometimes','required','string','max:255'],
+			'description' => ['nullable','string'],
+			'daily_rate' => ['sometimes','required','numeric','min:0'],
+			'pricing_unit' => ['sometimes','required','in:per_hour,per_day,per_week,per_month'],
+			'is_available' => ['sometimes','boolean'],
+			'location' => ['nullable','string','max:255'],
+			'is_active' => ['sometimes','boolean'],
+		];
+	}
 }

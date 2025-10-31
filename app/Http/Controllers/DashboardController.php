@@ -24,22 +24,55 @@ class DashboardController extends Controller
 		]);
 	}
 
-	public function admin()
+	public function admin(Request $request)
 	{
-		return view('admin.index', [
-			'users' => User::with('roles')->latest()->paginate(20),
-		]);
+		$filter = $request->input('filter', 'all');
+		$query = User::with('roles');
+
+		if ($filter === 'suspended') {
+			$query->where('is_suspended', true);
+		} elseif ($filter === 'active') {
+			$query->where('is_suspended', false);
+		} elseif ($filter === 'unverified_cni') {
+			$query->whereNotNull('cni_recto_path')
+			      ->whereNotNull('cni_verso_path')
+			      ->where('cni_verified', false);
+		}
+
+		$users = $query->latest()->paginate(20)->withQueryString();
+
+		$stats = [
+			'total' => User::count(),
+			'active' => User::where('is_suspended', false)->count(),
+			'suspended' => User::where('is_suspended', true)->count(),
+			'pending_cni' => User::whereNotNull('cni_recto_path')
+				->whereNotNull('cni_verso_path')
+				->where('cni_verified', false)
+				->count(),
+		];
+
+		return view('admin.index', compact('users', 'filter', 'stats'));
 	}
 
 	public function suspend(User $user)
 	{
 		$user->update(['is_suspended' => true]);
-		return back()->with('status', 'Utilisateur suspendu');
+		$redirectUrl = url()->previous();
+		// Ajouter un fragment pour éviter de retourner en haut de la page
+		if (strpos($redirectUrl, '#') === false) {
+			$redirectUrl .= '#user-' . $user->id;
+		}
+		return redirect($redirectUrl)->with('status', 'Utilisateur suspendu avec succès');
 	}
 
 	public function reactivate(User $user)
 	{
 		$user->update(['is_suspended' => false]);
-		return back()->with('status', 'Utilisateur réactivé');
+		$redirectUrl = url()->previous();
+		// Ajouter un fragment pour éviter de retourner en haut de la page
+		if (strpos($redirectUrl, '#') === false) {
+			$redirectUrl .= '#user-' . $user->id;
+		}
+		return redirect($redirectUrl)->with('status', 'Utilisateur réactivé avec succès');
 	}
 }

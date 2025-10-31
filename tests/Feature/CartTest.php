@@ -29,3 +29,5 @@ it('allows buyer to add to cart and checkout to create an order', function () {
 
     expect(Order::where('buyer_id', $buyer->id)->count())->toBe(1);
 });
+
+

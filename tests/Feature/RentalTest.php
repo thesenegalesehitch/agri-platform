@@ -41,3 +41,5 @@ it('prevents overlapping rentals and allows valid request', function () {
         'end_date' => now()->addDays(9)->toDateString(),
     ])->assertSessionHas('status');
 });
+
+

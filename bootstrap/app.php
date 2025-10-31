@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Ajouter le middleware pour vérifier les comptes suspendus
+        $middleware->alias([
+            'suspended' => \App\Http\Middleware\CheckSuspended::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

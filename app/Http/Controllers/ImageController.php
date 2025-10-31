@@ -33,7 +33,7 @@ class ImageController extends Controller
             $model->images()->create([
                 'path' => $path,
                 'is_primary' => false,
-                'sort_order' => (int)($model->images()->max('sort_order') + 1),
+                'sort_order' => (int)(($model->images()->max('sort_order') ?? 0) + 1),
             ]);
         }
 
@@ -52,7 +52,11 @@ class ImageController extends Controller
 	public function destroy(Image $image)
 	{
 		$imageable = $image->imageable;
-		$ownerId = method_exists($imageable, 'getAttribute') ? $imageable->getAttribute('user_id') : null;
+		if (!$imageable) {
+			$image->delete();
+			return back()->with('status', 'Image supprimée');
+		}
+		$ownerId = $imageable->user_id ?? null;
 		abort_unless($ownerId === Auth::id(), 403);
 
 		Storage::disk('public')->delete($image->path);

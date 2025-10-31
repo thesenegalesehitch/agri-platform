@@ -10,10 +10,24 @@ use App\Notifications\SuspensionStatusChanged;
 
 class SuspensionRequestController extends Controller
 {
-	public function index()
+	public function index(Request $request)
 	{
-		$requests = SuspensionRequest::latest()->paginate(20);
-		return view('suspensions.index', compact('requests'));
+		// Si admin, voir toutes les demandes, sinon seulement celles de l'utilisateur
+		$query = SuspensionRequest::with('user', 'admin');
+		
+		if (!Auth::user()->hasRole('admin')) {
+			$query->where('user_id', Auth::id());
+		}
+		
+		$statusFilter = $request->input('status');
+		if ($statusFilter && in_array($statusFilter, ['pending', 'approved', 'rejected'])) {
+			$query->where('status', $statusFilter);
+		}
+		
+		$requests = $query->latest()->paginate(20)->withQueryString();
+		
+		$isAdmin = Auth::user()->hasRole('admin');
+		return view('suspensions.index', compact('requests', 'isAdmin', 'statusFilter'));
 	}
 
 	public function create()

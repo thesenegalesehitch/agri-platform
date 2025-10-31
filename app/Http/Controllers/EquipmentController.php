@@ -25,11 +25,24 @@ class EquipmentController extends Controller
 	public function index(Request $request)
 	{
 		$query = Equipment::query()->with('category');
+		
+		// Si l'utilisateur est un propriétaire d'équipement, afficher uniquement ses équipements
+		if (Auth::check() && Auth::user()->hasRole('equipment_owner')) {
+			$query->where('user_id', Auth::id());
+		} else {
+			// Pour les non-connectés et autres rôles, afficher uniquement les équipements actifs et disponibles
+			$query->where('is_active', true)->where('is_available', true);
+		}
+		
 		if ($request->filled('q')) {
 			$query->where(function ($q) use ($request) {
 				$q->where('title', 'like', '%'.$request->q.'%')
-				  ->orWhere('description', 'like', '%'.$request->q.'%');
+				  ->orWhere('description', 'like', '%'.$request->q.'%')
+				  ->orWhere('location', 'like', '%'.$request->q.'%');
 			});
+		}
+		if ($request->filled('location')) {
+			$query->where('location', 'like', '%'.$request->input('location').'%');
 		}
 		if ($request->filled('category_id')) {
 			$query->where('category_id', $request->integer('category_id'));
@@ -43,10 +56,7 @@ class EquipmentController extends Controller
 		if ($request->filled('max_rate')) {
 			$query->where('daily_rate', '<=', (float)$request->input('max_rate'));
 		}
-		if (Auth::check() && Auth::user()->hasRole('equipment_owner')) {
-			$query->where('user_id', Auth::id());
-		}
-        $equipment = $query->latest()->paginate(12);
+        $equipment = $query->with('images')->latest()->paginate(12);
         if ($request->wantsJson()) return response()->json($equipment);
         $categories = Category::where('type','equipment')->orderBy('name')->get();
         return view('equipment.index', compact('equipment','categories'));
@@ -62,7 +72,7 @@ class EquipmentController extends Controller
 	{
 		$equipment = Equipment::create([
 			'user_id' => Auth::id(),
-			'category_id' => $request->integer('category_id'),
+			'category_id' => $request->integer('category_id') ?: null,
 			'title' => (string)$request->input('title'),
 			'description' => $request->input('description'),
 			'daily_rate' => $request->input('daily_rate'),
@@ -78,7 +88,7 @@ class EquipmentController extends Controller
 				$equipment->images()->create([
 					'path' => $path,
 					'is_primary' => false,
-					'sort_order' => (int)($equipment->images()->max('sort_order') + 1),
+					'sort_order' => (int)(($equipment->images()->max('sort_order') ?? 0) + 1),
 				]);
 			}
 		}
@@ -88,13 +98,15 @@ class EquipmentController extends Controller
 
 	public function show(Equipment $equipment, Request $request)
 	{
-		if ($request->wantsJson()) return response()->json($equipment->load('images','category','rentals'));
+		$equipment->load('images', 'category', 'user');
+		if ($request->wantsJson()) return response()->json($equipment);
 		return view('equipment.show', compact('equipment'));
 	}
 
 	public function edit(Equipment $equipment)
 	{
-		return view('equipment.edit', compact('equipment'));
+		$categories = Category::where('type','equipment')->orderBy('name')->get();
+		return view('equipment.edit', compact('equipment', 'categories'));
 	}
 
 	public function update(UpdateEquipmentRequest $request, Equipment $equipment)

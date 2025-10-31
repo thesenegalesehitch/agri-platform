@@ -25,3 +25,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	Route::post('suspension-requests', [SuspensionRequestController::class, 'store']);
 });
+
+

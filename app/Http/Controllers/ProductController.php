@@ -28,11 +28,32 @@ class ProductController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		$query = Product::query()->with('category');
+		$query = Product::query()->with('category', 'user');
+		
+		// Si l'utilisateur est un producteur, afficher uniquement ses produits
+		if (Auth::check() && Auth::user()->hasRole('producer')) {
+			$query->where('user_id', Auth::id());
+		} else {
+			// Pour les non-connectés et autres rôles, afficher uniquement les produits actifs
+			$query->where('is_active', true);
+		}
+		
 		if ($request->filled('q')) {
 			$query->where(function ($q) use ($request) {
 				$q->where('title', 'like', '%'.$request->q.'%')
-				  ->orWhere('description', 'like', '%'.$request->q.'%');
+				  ->orWhere('description', 'like', '%'.$request->q.'%')
+				  ->orWhereHas('user', function ($userQuery) use ($request) {
+					  $userQuery->where('region', 'like', '%'.$request->q.'%')
+					           ->orWhere('ville', 'like', '%'.$request->q.'%')
+					           ->orWhere('address_line1', 'like', '%'.$request->q.'%');
+				  });
+			});
+		}
+		if ($request->filled('location')) {
+			$query->whereHas('user', function ($userQuery) use ($request) {
+				$userQuery->where('region', 'like', '%'.$request->input('location').'%')
+				         ->orWhere('ville', 'like', '%'.$request->input('location').'%')
+				         ->orWhere('address_line1', 'like', '%'.$request->input('location').'%');
 			});
 		}
 		if ($request->filled('category_id')) {
@@ -44,10 +65,7 @@ class ProductController extends Controller
 		if ($request->filled('max_price')) {
 			$query->where('price', '<=', (float)$request->input('max_price'));
 		}
-		if (Auth::check() && Auth::user()->hasRole('producer')) {
-			$query->where('user_id', Auth::id());
-		}
-        $products = $query->latest()->paginate(12);
+        $products = $query->with('images')->latest()->paginate(12);
         if ($request->wantsJson()) return response()->json($products);
         $categories = Category::where('type', 'product')->orderBy('name')->get();
         return view('products.index', compact('products','categories'));
@@ -72,7 +90,7 @@ class ProductController extends Controller
 	{
 		$product = Product::create([
 			'user_id' => Auth::id(),
-			'category_id' => $request->integer('category_id'),
+			'category_id' => $request->integer('category_id') ?: null,
 			'title' => (string)$request->input('title'),
 			'description' => $request->input('description'),
 			'price' => $request->input('price'),
@@ -87,7 +105,7 @@ class ProductController extends Controller
 				$product->images()->create([
 					'path' => $path,
 					'is_primary' => false,
-					'sort_order' => (int)($product->images()->max('sort_order') + 1),
+					'sort_order' => (int)(($product->images()->max('sort_order') ?? 0) + 1),
 				]);
 			}
 		}
@@ -97,13 +115,15 @@ class ProductController extends Controller
 
 	public function show(Product $product, Request $request)
 	{
-		if ($request->wantsJson()) return response()->json($product->load('images','category'));
+		$product->load('images', 'category', 'user');
+		if ($request->wantsJson()) return response()->json($product);
 		return view('products.show', compact('product'));
 	}
 
 	public function edit(Product $product)
 	{
-		return view('products.edit', compact('product'));
+		$categories = Category::where('type','product')->orderBy('name')->get();
+		return view('products.edit', compact('product', 'categories'));
 	}
 
 	public function update(UpdateProductRequest $request, Product $product)
