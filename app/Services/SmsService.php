@@ -73,7 +73,7 @@ class SmsService
      */
     public function sendVerificationCode(string $to, string $code): bool|string
     {
-        $message = "Votre code de vérification AgriPlatform est : {$code}. Valable 10 minutes. Ne partagez pas ce code.";
+        $message = "Votre code de vérification AgriLink est : {$code}. Valable 10 minutes. Ne partagez pas ce code.";
         return $this->send($to, $message);
     }
 

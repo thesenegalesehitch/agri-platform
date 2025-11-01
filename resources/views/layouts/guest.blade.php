@@ -28,7 +28,7 @@
             <div class="mb-6">
                 <a href="/" class="flex items-center gap-2">
                     <span class="text-4xl">🌾</span>
-                    <span class="text-2xl font-bold text-[#5c4033]">AgriPlatform</span>
+                    <span class="text-2xl font-bold text-[#5c4033]">AgriLink</span>
                 </a>
             </div>
 

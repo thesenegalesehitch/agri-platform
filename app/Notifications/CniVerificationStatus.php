@@ -26,7 +26,7 @@ class CniVerificationStatus extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $mail = (new MailMessage)
-            ->subject('Statut de vérification de votre CNI - AgriPlatform');
+            ->subject('Statut de vérification de votre CNI - AgriLink');
 
         if ($this->status === 'approved') {
             $mail->line('Votre carte d\'identité nationale (CNI) a été vérifiée et approuvée.')

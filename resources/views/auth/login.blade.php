@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-[#5c4033] text-center">Connexion</h2>
-        <p class="text-sm text-[#55493f] text-center mt-2">Connectez-vous à votre compte AgriPlatform</p>
+        <p class="text-sm text-[#55493f] text-center mt-2">Connectez-vous à votre compte AgriLink</p>
     </div>
 
     <!-- Session Status -->

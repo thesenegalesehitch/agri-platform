@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-[#5c4033] text-center">Créer un compte</h2>
-        <p class="text-sm text-[#55493f] text-center mt-2">Rejoignez AgriPlatform et accédez à tous nos services</p>
+        <p class="text-sm text-[#55493f] text-center mt-2">Rejoignez AgriLink et accédez à tous nos services</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}">

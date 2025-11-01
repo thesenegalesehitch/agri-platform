@@ -302,7 +302,7 @@
         <div class="nav-container">
             <a href="{{ url('/') }}" class="nav-logo">
                 <span class="nav-logo-icon">🌾</span>
-                <span>AgriPlatform</span>
+                <span>AgriLink</span>
             </a>
             <div class="nav-links">
                 <a href="{{ route('products.index') }}" class="nav-link">Produits</a>
@@ -339,7 +339,7 @@
                 height="1080"
             >
             <div class="hero-overlay">
-                <h1 class="hero-title">Bienvenue sur AgriPlatform</h1>
+                <h1 class="hero-title">Bienvenue sur AgriLink</h1>
                 <p class="hero-subtitle">La plateforme agricole moderne qui connecte producteurs, acheteurs et propriétaires d'équipements au Sénégal.</p>
                 <div class="hero-buttons">
                     <a href="{{ route('products.index') }}" class="hero-btn hero-btn-primary">Découvrir les Produits</a>
@@ -422,7 +422,7 @@
 
     <!-- 🌾 Footer -->
     <footer>
-        Bienvenue sur AgriPlatform — Votre partenaire agricole au Sénégal
+        Bienvenue sur AgriLink — Votre partenaire agricole au Sénégal
     </footer>
 </body>
 </html>

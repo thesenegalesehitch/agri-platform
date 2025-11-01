@@ -5,7 +5,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}" class="text-lg font-bold text-white flex items-center gap-2">
                         <span class="text-2xl">🌾</span>
-                        <span>AgriPlatform</span>
+                        <span>AgriLink</span>
                     </a>
                 </div>
                 <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
