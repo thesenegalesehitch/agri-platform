@@ -48,9 +48,26 @@ class RentalController extends Controller
      */
     public function store(Request $request, ?Equipment $equipment = null)
     {
+        $today = now()->toDateString();
+        
         $data = $request->validate([
-            'start_date' => ['required','date','after_or_equal:today'],
-            'end_date' => ['required','date','after:start_date'],
+            'start_date' => [
+                'required',
+                'date',
+                'after_or_equal:' . $today,
+            ],
+            'end_date' => [
+                'required',
+                'date',
+                'after:start_date',
+            ],
+        ], [
+            'start_date.required' => 'La date de début est obligatoire.',
+            'start_date.date' => 'La date de début doit être une date valide.',
+            'start_date.after_or_equal' => 'La date de début ne peut pas être antérieure à aujourd\'hui (' . $today . ').',
+            'end_date.required' => 'La date de fin est obligatoire.',
+            'end_date.date' => 'La date de fin doit être une date valide.',
+            'end_date.after' => 'La date de fin doit être postérieure à la date de début.',
         ]);
 
         if (!$equipment && $request->route('equipment')) {
@@ -96,7 +113,9 @@ class RentalController extends Controller
      */
     public function show(Rental $rental)
     {
-        //
+        $this->authorize('view', $rental);
+        $rental->load(['equipment.user', 'equipment.category', 'equipment.images', 'renter']);
+        return view('rentals.show', compact('rental'));
     }
 
     /**

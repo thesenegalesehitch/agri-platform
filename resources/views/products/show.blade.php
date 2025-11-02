@@ -14,7 +14,7 @@
 				@if($primary)
 					<div class="relative overflow-hidden rounded-lg shadow-lg mb-4">
 						<img 
-							src="{{ Storage::url($primary->path) }}" 
+							src="{{ $primary->url }}" 
 							loading="eager"
 							decoding="async"
 							class="w-full h-64 md:h-80 object-cover" 
@@ -34,9 +34,9 @@
 						<h4 class="text-lg font-semibold text-[#5c4033] mb-3">Autres photos ({{ $product->images->count() - 1 }})</h4>
 						<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 							@foreach($product->images->where('id', '!=', $primary->id ?? null)->sortBy('sort_order') as $img)
-								<div class="relative group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer" onclick="openImageModal('{{ Storage::url($img->path) }}', '{{ $product->title }}')">
+								<div class="relative group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer" 								onclick="openImageModal('{{ $img->url }}', '{{ $product->title }}')">
 									<img 
-										src="{{ Storage::url($img->path) }}" 
+										src="{{ $img->url }}"
 										loading="lazy"
 										decoding="async"
 										class="w-full h-32 md:h-40 object-cover group-hover:scale-110 transition-transform duration-300" 
@@ -185,23 +185,131 @@
 					</div>
 
 					<div class="border-t border-[#d0c9c0] pt-6 mt-6">
-						<h3 class="section-title-agri">Ajouter des Images</h3>
-						<form method="POST" action="{{ route('images.store') }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-4">
-							@csrf
-							<input type="hidden" name="imageable_type" value="product" />
-							<input type="hidden" name="imageable_id" value="{{ $product->id }}" />
-							<div class="flex-1 min-w-64">
-								<input type="file" name="images[]" multiple required class="form-input-agri" />
+						<h3 class="section-title-agri mb-4">Ajouter des Images (Maximum 10)</h3>
+						<p class="text-sm text-[#55493f] mb-4">
+							Images actuelles: {{ $product->images->count() }} / 10
+						</p>
+						
+						<!-- Onglets -->
+						<div class="border-b border-[#d0c9c0] mb-4">
+							<div class="flex gap-4">
+								<button type="button" onclick="switchImageTab('upload')" id="tab-upload" class="px-4 py-2 border-b-2 border-[#4CAF50] text-[#4CAF50] font-semibold">
+									📁 Upload Local
+								</button>
+								<button type="button" onclick="switchImageTab('url')" id="tab-url" class="px-4 py-2 border-b-2 border-transparent text-[#55493f] hover:text-[#4CAF50]">
+									🔗 Par URL
+								</button>
 							</div>
-							<label class="inline-flex items-center space-x-2">
-								<input type="checkbox" name="is_primary" value="1" class="rounded border-[#d0c9c0] text-[#4CAF50] focus:ring-[#4CAF50]" />
-								<span class="text-[#55493f]">Définir comme principale</span>
-							</label>
-							<button type="submit" class="btn-primary-agri">
-								📤 Uploader
-							</button>
-						</form>
+						</div>
+
+						<!-- Formulaire Upload -->
+						<div id="image-upload-tab" class="image-tab-content">
+							<form method="POST" action="{{ route('images.store') }}" enctype="multipart/form-data" class="space-y-4">
+								@csrf
+								<input type="hidden" name="imageable_type" value="product" />
+								<input type="hidden" name="imageable_id" value="{{ $product->id }}" />
+								<div>
+									<label class="form-label-agri">Sélectionner des fichiers</label>
+									<input type="file" name="images[]" multiple accept="image/*" class="form-input-agri" />
+									<p class="text-xs text-[#55493f] mt-1">Maximum 10 images au total ({{ $product->images->count() }} déjà ajoutées)</p>
+								</div>
+								<div class="flex items-center gap-3">
+									<label class="inline-flex items-center space-x-2">
+										<input type="checkbox" name="is_primary" value="1" class="rounded border-[#d0c9c0] text-[#4CAF50] focus:ring-[#4CAF50]" />
+										<span class="text-[#55493f]">Définir la première comme principale</span>
+									</label>
+									<button type="submit" class="btn-primary-agri">
+										📤 Uploader
+									</button>
+								</div>
+							</form>
+						</div>
+
+						<!-- Formulaire URL -->
+						<div id="image-url-tab" class="image-tab-content hidden">
+							<form method="POST" action="{{ route('images.store') }}" enctype="multipart/form-data" class="space-y-4" id="url-form">
+								@csrf
+								<input type="hidden" name="imageable_type" value="product" />
+								<input type="hidden" name="imageable_id" value="{{ $product->id }}" />
+								<div id="url-inputs" class="space-y-2">
+									<div class="url-input-group">
+										<label class="form-label-agri">URL de l'image</label>
+										<div class="flex gap-2">
+											<input type="url" name="image_urls[]" placeholder="https://exemple.com/image.jpg" class="form-input-agri flex-1" />
+											<button type="button" onclick="removeUrlInput(this)" class="btn-danger-agri px-3">✕</button>
+										</div>
+									</div>
+								</div>
+								<button type="button" onclick="addUrlInput()" class="btn-secondary-agri text-sm">
+									+ Ajouter une autre URL
+								</button>
+								<div class="flex items-center gap-3 pt-2">
+									<label class="form-label-agri">Image principale:</label>
+									<select name="primary_image_index" id="primary-url-select" class="form-select-agri">
+										<option value="">Aucune</option>
+									</select>
+								</div>
+								<button type="submit" class="btn-primary-agri mt-4">
+									🔗 Ajouter les Images
+								</button>
+							</form>
+						</div>
 					</div>
+
+					<script>
+						function switchImageTab(tab) {
+							document.querySelectorAll('.image-tab-content').forEach(el => el.classList.add('hidden'));
+							document.querySelectorAll('[id^="tab-"]').forEach(el => {
+								el.classList.remove('border-[#4CAF50]', 'text-[#4CAF50');
+								el.classList.add('border-transparent', 'text-[#55493f]');
+							});
+							
+							if (tab === 'upload') {
+								document.getElementById('image-upload-tab').classList.remove('hidden');
+								document.getElementById('tab-upload').classList.add('border-[#4CAF50]', 'text-[#4CAF50');
+								document.getElementById('tab-upload').classList.remove('border-transparent', 'text-[#55493f]');
+							} else {
+								document.getElementById('image-url-tab').classList.remove('hidden');
+								document.getElementById('tab-url').classList.add('border-[#4CAF50]', 'text-[#4CAF50]');
+								document.getElementById('tab-url').classList.remove('border-transparent', 'text-[#55493f]');
+								updatePrimarySelect();
+							}
+						}
+
+						function addUrlInput() {
+							const container = document.getElementById('url-inputs');
+							const newGroup = document.createElement('div');
+							newGroup.className = 'url-input-group';
+							newGroup.innerHTML = `
+								<label class="form-label-agri">URL de l'image</label>
+								<div class="flex gap-2">
+									<input type="url" name="image_urls[]" placeholder="https://exemple.com/image.jpg" class="form-input-agri flex-1" onchange="updatePrimarySelect()" />
+									<button type="button" onclick="removeUrlInput(this)" class="btn-danger-agri px-3">✕</button>
+								</div>
+							`;
+							container.appendChild(newGroup);
+							updatePrimarySelect();
+						}
+
+						function removeUrlInput(btn) {
+							btn.closest('.url-input-group').remove();
+							updatePrimarySelect();
+						}
+
+						function updatePrimarySelect() {
+							const inputs = document.querySelectorAll('input[name="image_urls[]"]');
+							const select = document.getElementById('primary-url-select');
+							select.innerHTML = '<option value="">Aucune</option>';
+							inputs.forEach((input, index) => {
+								if (input.value.trim()) {
+									const option = document.createElement('option');
+									option.value = index;
+									option.textContent = `Image ${index + 1}${input.value.length > 40 ? ': ' + input.value.substring(0, 40) + '...' : ': ' + input.value}`;
+									select.appendChild(option);
+								}
+							});
+						}
+					</script>
 
 					<div class="border-t border-[#d0c9c0] pt-6 mt-6 flex flex-wrap gap-3">
 						<a href="{{ route('products.edit',$product) }}" class="btn-secondary-agri">

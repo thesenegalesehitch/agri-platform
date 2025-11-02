@@ -50,6 +50,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect('/')->with('status', 'Votre compte a été créé avec succès ! Bienvenue sur AgriLink.');
     }
 }

@@ -1,11 +1,11 @@
+@php
+	use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
 	<x-slot name="header">
 		<h2 class="page-title-agri">Vérification des CNI</h2>
 	</x-slot>
-
-	@php
-		use Illuminate\Support\Facades\Storage;
-	@endphp
 
 	<!-- Filtres -->
 	<div class="content-card fade-in mb-6">

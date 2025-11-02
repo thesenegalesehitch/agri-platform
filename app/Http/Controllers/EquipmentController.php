@@ -64,13 +64,42 @@ class EquipmentController extends Controller
 
     public function create()
 	{
-        $categories = Category::where('type','equipment')->orderBy('name')->get();
+		// Vérifier que l'utilisateur est authentifié
+		if (!Auth::check()) {
+			return redirect()->route('login')->withErrors(['error' => 'Vous devez être connecté pour créer un équipement.']);
+		}
+		
+		// Vérifier le rôle via middleware et policy
+		$this->authorize('create', Equipment::class);
+		
+		// Double vérification du rôle
+		if (!Auth::user()->hasRole('equipment_owner')) {
+			abort(403, 'Vous n\'avez pas le rôle requis pour créer un équipement.');
+		}
+		
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_equipment', 3600, function () {
+            return Category::where('type','equipment')->orderBy('name')->get();
+        });
         return view('equipment.create', compact('categories'));
 	}
 
 	public function store(StoreEquipmentRequest $request)
 	{
-		$equipment = Equipment::create([
+		// Vérifier que l'utilisateur est authentifié
+		if (!Auth::check()) {
+			return redirect()->route('login')->withErrors(['error' => 'Vous devez être connecté pour créer un équipement.']);
+		}
+		
+		// Vérifier le rôle
+		$this->authorize('create', Equipment::class);
+		
+		if (!Auth::user()->hasRole('equipment_owner')) {
+			abort(403, 'Vous n\'avez pas le rôle requis pour créer un équipement.');
+		}
+		
+		\Illuminate\Support\Facades\DB::beginTransaction();
+		try {
+			$equipment = Equipment::create([
 			'user_id' => Auth::id(),
 			'category_id' => $request->integer('category_id') ?: null,
 			'title' => (string)$request->input('title'),
@@ -82,18 +111,33 @@ class EquipmentController extends Controller
 			'is_active' => $request->boolean('is_active', true),
 		]);
 
-		if ($request->hasFile('images')) {
-			foreach ($request->file('images') as $image) {
-				$path = $image->store('uploads', 'public');
-				$equipment->images()->create([
-					'path' => $path,
-					'is_primary' => false,
-					'sort_order' => (int)(($equipment->images()->max('sort_order') ?? 0) + 1),
-				]);
+			// Vérifier la limite de 10 images
+			$currentImageCount = $equipment->images()->count();
+			$newImageCount = count($request->file('images', []));
+			if ($currentImageCount + $newImageCount > 10) {
+				throw new \Exception('Vous ne pouvez pas avoir plus de 10 images. Actuellement: ' . $currentImageCount);
 			}
-		}
 
-		return redirect()->route('equipment.show', $equipment)->with('status', 'Matériel créé');
+			if ($request->hasFile('images')) {
+				$firstImage = true;
+				foreach ($request->file('images') as $image) {
+					$path = $image->store('uploads', 'public');
+					$equipment->images()->create([
+						'path' => $path,
+						'source_type' => 'local',
+						'is_primary' => $firstImage && $equipment->images()->count() === 0, // Première image devient principale si aucune autre
+						'sort_order' => (int)(($equipment->images()->max('sort_order') ?? 0) + 1),
+					]);
+					$firstImage = false;
+				}
+			}
+			
+			\Illuminate\Support\Facades\DB::commit();
+			return redirect()->route('equipment.show', $equipment)->with('status', 'Matériel créé avec succès');
+		} catch (\Exception $e) {
+			\Illuminate\Support\Facades\DB::rollBack();
+			return back()->withErrors(['error' => 'Erreur lors de la création du matériel: ' . $e->getMessage()])->withInput();
+		}
 	}
 
 	public function show(Equipment $equipment, Request $request)
@@ -105,8 +149,11 @@ class EquipmentController extends Controller
 
 	public function edit(Equipment $equipment)
 	{
-		$categories = Category::where('type','equipment')->orderBy('name')->get();
-		return view('equipment.edit', compact('equipment', 'categories'));
+		$this->authorize('update', $equipment);
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_equipment', 3600, function () {
+            return Category::where('type','equipment')->orderBy('name')->get();
+        });
+        return view('equipment.edit', compact('equipment', 'categories'));
 	}
 
 	public function update(UpdateEquipmentRequest $request, Equipment $equipment)

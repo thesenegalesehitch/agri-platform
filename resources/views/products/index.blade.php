@@ -20,6 +20,22 @@
 		</h2>
 	</x-slot>
 
+	@if(session('status'))
+		<div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+			{{ session('status') }}
+		</div>
+	@endif
+
+	@if($errors->any())
+		<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+			<ul class="list-disc list-inside text-red-600 text-sm space-y-1">
+				@foreach($errors->all() as $error)
+					<li>{{ $error }}</li>
+				@endforeach
+			</ul>
+		</div>
+	@endif
+
 	<div class="content-card fade-in mb-6">
 		<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 			@role('producer')
@@ -91,7 +107,7 @@
 					@php $primaryImage = $product->images->firstWhere('is_primary', 1) ?? $product->images->first(); @endphp
 					<div class="h-48 overflow-hidden rounded-lg mb-4">
 						<img 
-							src="{{ Storage::url($primaryImage->path) }}" 
+							src="{{ $primaryImage->url }}" 
 							loading="lazy"
 							decoding="async"
 							class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
@@ -108,11 +124,31 @@
 				<div>
 					<h3 class="font-bold text-lg mb-2 text-[#5c4033]">{{ $product->title }}</h3>
 					<p class="text-sm text-[#55493f] mb-3 line-clamp-2">{{ Str::limit($product->description, 100) }}</p>
-					<div class="flex justify-between items-center mt-4">
+					@if($product->stock > 0)
+						<p class="text-xs text-[#4CAF50] mb-2">✓ En stock ({{ $product->stock }} disponible{{ $product->stock > 1 ? 's' : '' }})</p>
+					@else
+						<p class="text-xs text-red-600 mb-2">✗ Rupture de stock</p>
+					@endif
+					<div class="flex justify-between items-center gap-2 mt-4">
 						<span class="text-lg font-semibold text-[#4CAF50]">{{ number_format($product->price * 655.957, 0, ',', ' ') }} FCFA</span>
-						<a href="{{ route('products.show',$product) }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-							Voir détails
-						</a>
+						<div class="flex gap-2">
+							@auth
+								@role('buyer')
+									@if($product->stock > 0)
+										<form method="POST" action="{{ route('cart.add', $product) }}" class="inline">
+											@csrf
+											<input type="hidden" name="quantity" value="1">
+											<button type="submit" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="this.textContent='Ajout...'; this.disabled=true;">
+												🛒 Ajouter
+											</button>
+										</form>
+									@endif
+								@endrole
+							@endauth
+							<a href="{{ route('products.show',$product) }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+								Voir détails
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -223,5 +259,21 @@
 				});
 			}
 		})();
+
+		// Afficher un message de confirmation après ajout au panier
+		@if(session('status'))
+			setTimeout(() => {
+				const message = document.createElement('div');
+				message.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+				message.textContent = '{{ session('status') }}';
+				document.body.appendChild(message);
+				
+				setTimeout(() => {
+					message.style.transition = 'opacity 0.5s';
+					message.style.opacity = '0';
+					setTimeout(() => message.remove(), 500);
+				}, 3000);
+			}, 100);
+		@endif
 	</script>
 </x-app-layout>

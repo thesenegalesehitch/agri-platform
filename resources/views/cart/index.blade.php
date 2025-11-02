@@ -1,11 +1,11 @@
+@php
+	use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
 	<x-slot name="header">
 		<h2 class="page-title-agri">Mon Panier</h2>
 	</x-slot>
-
-	@php
-		use Illuminate\Support\Facades\Storage;
-	@endphp
 
 	<div class="content-card fade-in">
 		@php
@@ -27,7 +27,7 @@
 							@if($product->images && $product->images->count())
 								@php $primaryImage = $product->images->firstWhere('is_primary', 1) ?? $product->images->first(); @endphp
 								<img 
-									src="{{ Storage::url($primaryImage->path) }}" 
+									src="{{ $primaryImage->url }}" 
 									alt="{{ $product->title }}" 
 									class="w-20 h-20 object-cover rounded-lg"
 									loading="lazy"

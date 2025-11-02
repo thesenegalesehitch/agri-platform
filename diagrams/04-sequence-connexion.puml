@@ -1,0 +1,124 @@
+@startuml Diagramme de Séquence - Connexion
+
+!define PRIMARY_COLOR #5c4033
+!define SUCCESS_COLOR #4CAF50
+!define ERROR_COLOR #F44336
+!define WARNING_COLOR #FF9800
+
+skinparam sequence {
+    ArrowColor PRIMARY_COLOR
+    LifeLineBorderColor PRIMARY_COLOR
+    ParticipantBorderColor PRIMARY_COLOR
+    ActorBorderColor PRIMARY_COLOR
+    LifeLineBackgroundColor #FFF
+}
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+actor "Utilisateur" as User
+participant "Navigateur" as Browser
+participant "AuthenticatedSessionController" as Controller
+participant "LoginRequest\n(Validation)" as Validation
+participant "RateLimiter\nFacade" as RateLimiter
+participant "Auth\nFacade" as Auth
+participant "User Model" as UserModel
+database "Base de\nDonnées" as DB
+
+== Affichage du formulaire ==
+User -> Browser: Accède à /login
+Browser -> Controller: GET /login
+Controller -> Browser: Retourne view('auth.login')
+Browser -> User: Affiche formulaire de connexion
+
+== Soumission du formulaire ==
+User -> Browser: Remplit email et password\n(optionnel: remember)
+Browser -> Controller: POST /login\n(avec credentials)
+
+== Validation et Rate Limiting ==
+Controller -> Validation: authenticate()
+
+Validation -> RateLimiter: tooManyAttempts(throttleKey, 5)
+
+alt Trop de tentatives
+    RateLimiter --> Validation: true
+    Validation -> RateLimiter: availableIn(throttleKey)
+    RateLimiter --> Validation: seconds restants
+    Validation -> Validation: throw ValidationException
+    Validation --> Browser: Retourne erreur throttling
+    Browser --> User: Affiche "Trop de tentatives,\nréessayez dans X minutes"
+    stop
+else Pas de limite dépassée
+    RateLimiter --> Validation: false
+end
+
+Validation -> RateLimiter: ensureIsNotRateLimited()
+
+== Authentification ==
+Validation -> Auth: attempt(email, password, remember)
+Auth -> DB: SELECT * FROM users WHERE email = ?
+DB --> Auth: User trouvé ou null
+
+alt Utilisateur trouvé
+    Auth -> Auth: Vérifie password hash
+    alt Mot de passe correct
+        Auth -> Auth: Vérifie is_suspended
+        alt Compte suspendu
+            Auth --> Validation: false
+            Validation -> RateLimiter: hit(throttleKey)
+            RateLimiter --> Validation: Incrémente compteur
+            Validation --> Browser: Erreur authentification
+            Browser --> User: Affiche "Identifiants incorrects"
+            stop
+        else Compte actif
+            Auth --> Validation: true
+        end
+    else Mot de passe incorrect
+        Auth --> Validation: false
+        Validation -> RateLimiter: hit(throttleKey)
+        Validation --> Browser: Erreur authentification
+        Browser --> User: Affiche "Identifiants incorrects"
+        stop
+    end
+else Utilisateur non trouvé
+    Auth --> Validation: false
+    Validation -> RateLimiter: hit(throttleKey)
+    Validation --> Browser: Erreur authentification
+    Browser --> User: Affiche "Identifiants incorrects"
+    stop
+end
+
+== Authentification réussie ==
+Validation -> RateLimiter: clear(throttleKey)
+RateLimiter --> Validation: Compteur réinitialisé
+
+Validation --> Controller: Authentification réussie
+
+== Régénération de session ==
+Controller -> Browser: session()->regenerate()
+Browser -> DB: Génère nouvelle session ID
+DB --> Browser: Nouvelle session créée
+
+== Redirection ==
+Controller -> Controller: redirect()->intended(route('dashboard'))
+Controller -> Browser: Redirection vers dashboard
+Browser -> User: Redirige vers /dashboard\nAffiche interface utilisateur
+
+note over User,DB #SUCCESS_COLOR
+  **Résultat:**
+  - Session régénérée (protection CSRF)
+  - Utilisateur authentifié
+  - Redirection vers dashboard
+  - Accès aux fonctionnalités selon rôle
+end note
+
+note over RateLimiter,Auth #WARNING_COLOR
+  **Sécurité:**
+  - Rate limiting: max 5 tentatives
+  - Vérification compte suspendu
+  - Régénération session (fixation)
+  - Hash password avec bcrypt
+end note
+
+@enduml
+

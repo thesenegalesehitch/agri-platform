@@ -1,0 +1,202 @@
+@startuml Diagramme de Classe - AgriLink
+
+!define PRIMARY_COLOR #5c4033
+!define SECONDARY_COLOR #4CAF50
+!define TERTIARY_COLOR #d0c9c0
+
+skinparam class {
+    BackgroundColor<<Entity>> #E8E8E8
+    BackgroundColor<<Controller>> #D4E4F7
+    BorderColor PRIMARY_COLOR
+    ArrowColor PRIMARY_COLOR
+}
+
+skinparam linetype {
+    LineColor PRIMARY_COLOR
+}
+
+package "Models" {
+    class User <<Entity>> {
+        -id: bigint
+        -name: string
+        -email: string
+        -password: string
+        -phone: string
+        -phone_verified: boolean
+        -cni_number: string
+        -cni_recto_path: string
+        -cni_verso_path: string
+        -cni_verified: boolean
+        -region: string
+        -ville: string
+        -address_line1: string
+        -is_suspended: boolean
+        +hasRole(role): boolean
+        +assignRole(role): void
+    }
+
+    class Product <<Entity>> {
+        -id: bigint
+        -user_id: bigint
+        -category_id: bigint
+        -title: string
+        -description: text
+        -price: decimal
+        -stock: integer
+        -pricing_unit: string
+        -is_active: boolean
+        -deleted_at: timestamp
+    }
+
+    class Equipment <<Entity>> {
+        -id: bigint
+        -user_id: bigint
+        -category_id: bigint
+        -title: string
+        -description: text
+        -daily_rate: decimal
+        -location: string
+        -pricing_unit: string
+        -is_available: boolean
+        -is_active: boolean
+        -deleted_at: timestamp
+    }
+
+    class Category <<Entity>> {
+        -id: bigint
+        -name: string
+        -slug: string
+        -type: string
+        -parent_id: bigint
+    }
+
+    class Order <<Entity>> {
+        -id: bigint
+        -buyer_id: bigint
+        -status: enum
+        -total: decimal
+        -payment_method: enum
+        -cash_payment_details: text
+        -paid_at: datetime
+        -cancellation_requested: boolean
+        -cancellation_reason: text
+        -cancellation_requested_at: datetime
+        +canBePaid(): boolean
+        +canBeCancelled(): boolean
+        +isPendingPayment(): boolean
+    }
+
+    class OrderItem <<Entity>> {
+        -id: bigint
+        -order_id: bigint
+        -product_id: bigint
+        -quantity: integer
+        -unit_price: decimal
+        -total: decimal
+    }
+
+    class Rental <<Entity>> {
+        -id: bigint
+        -equipment_id: bigint
+        -renter_id: bigint
+        -start_date: date
+        -end_date: date
+        -status: enum
+        -total: decimal
+    }
+
+    class Image <<Entity>> {
+        -id: bigint
+        -imageable_type: string
+        -imageable_id: bigint
+        -path: string
+        -source_type: enum
+        -is_primary: boolean
+        -sort_order: integer
+        +getUrlAttribute(): string
+        +exists(): boolean
+    }
+
+    class SuspensionRequest <<Entity>> {
+        -id: bigint
+        -user_id: bigint
+        -admin_id: bigint
+        -reason: text
+        -status: enum
+        -reviewed_at: datetime
+        -response: text
+    }
+
+    class Role <<Entity>> {
+        -id: bigint
+        -name: string
+        -guard_name: string
+    }
+
+    class Permission <<Entity>> {
+        -id: bigint
+        -name: string
+        -guard_name: string
+    }
+}
+
+' Relations User
+User ||--o{ Product : "possède"
+User ||--o{ Equipment : "possède"
+User ||--o{ Order : "passe (buyer)"
+User ||--o{ Rental : "loue (renter)"
+User ||--o{ SuspensionRequest : "demande"
+User ||--o{ SuspensionRequest : "traite (admin)"
+User }o--o{ Role : "a"
+Role }o--o{ Permission : "a"
+
+' Relations Product
+Product }o--|| Category : "appartient à"
+Product ||--o{ Image : "a"
+Product ||--o{ OrderItem : "contient"
+
+' Relations Equipment
+Equipment }o--|| Category : "appartient à"
+Equipment ||--o{ Image : "a"
+Equipment ||--o{ Rental : "reçoit"
+
+' Relations Order
+Order ||--o{ OrderItem : "contient"
+
+' Relations Category
+Category ||--o{ Category : "parent (self)"
+
+' Relations Image (Polymorphique)
+Image }o--|| Product : "imageable (morph)"
+Image }o--|| Equipment : "imageable (morph)"
+
+note right of User
+  **Rôles supportés:**
+  - buyer (Acheteur)
+  - producer (Producteur)
+  - equipment_owner (Propriétaire)
+  - admin (Administrateur)
+end note
+
+note right of Order
+  **Statuts possibles:**
+  - pending
+  - pending_payment
+  - pending_validation
+  - paid
+  - cancelled
+  - completed
+end note
+
+note right of Rental
+  **Statuts possibles:**
+  - pending
+  - approved
+  - rejected
+  - active
+  - completed
+  - cancelled
+end note
+
+@enduml
+

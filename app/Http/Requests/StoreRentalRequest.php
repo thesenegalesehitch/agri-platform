@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreRentalRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class StoreRentalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check() && (Auth::user()->hasRole('buyer') || Auth::user()->hasRole('producer') || Auth::user()->hasRole('equipment_owner'));
     }
 
     /**

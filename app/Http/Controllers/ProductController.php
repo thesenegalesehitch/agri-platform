@@ -82,13 +82,42 @@ class ProductController extends Controller
 	 */
     public function create()
 	{
-        $categories = Category::where('type','product')->orderBy('name')->get();
+		// Vérifier que l'utilisateur est authentifié
+		if (!Auth::check()) {
+			return redirect()->route('login')->withErrors(['error' => 'Vous devez être connecté pour créer un produit.']);
+		}
+		
+		// Vérifier le rôle via middleware et policy
+		$this->authorize('create', Product::class);
+		
+		// Double vérification du rôle
+		if (!Auth::user()->hasRole('producer')) {
+			abort(403, 'Vous n\'avez pas le rôle requis pour créer un produit.');
+		}
+		
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_product', 3600, function () {
+            return Category::where('type','product')->orderBy('name')->get();
+        });
         return view('products.create', compact('categories'));
 	}
 
 	public function store(StoreProductRequest $request)
 	{
-		$product = Product::create([
+		// Vérifier que l'utilisateur est authentifié
+		if (!Auth::check()) {
+			return redirect()->route('login')->withErrors(['error' => 'Vous devez être connecté pour créer un produit.']);
+		}
+		
+		// Vérifier le rôle
+		$this->authorize('create', Product::class);
+		
+		if (!Auth::user()->hasRole('producer')) {
+			abort(403, 'Vous n\'avez pas le rôle requis pour créer un produit.');
+		}
+		
+		\Illuminate\Support\Facades\DB::beginTransaction();
+		try {
+			$product = Product::create([
 			'user_id' => Auth::id(),
 			'category_id' => $request->integer('category_id') ?: null,
 			'title' => (string)$request->input('title'),
@@ -99,18 +128,33 @@ class ProductController extends Controller
 			'is_active' => $request->boolean('is_active', true),
 		]);
 
-		if ($request->hasFile('images')) {
-			foreach ($request->file('images') as $image) {
-				$path = $image->store('uploads', 'public');
-				$product->images()->create([
-					'path' => $path,
-					'is_primary' => false,
-					'sort_order' => (int)(($product->images()->max('sort_order') ?? 0) + 1),
-				]);
+			// Vérifier la limite de 10 images
+			$currentImageCount = $product->images()->count();
+			$newImageCount = count($request->file('images', []));
+			if ($currentImageCount + $newImageCount > 10) {
+				throw new \Exception('Vous ne pouvez pas avoir plus de 10 images. Actuellement: ' . $currentImageCount);
 			}
-		}
 
-		return redirect()->route('products.show', $product)->with('status', 'Produit créé');
+			if ($request->hasFile('images')) {
+				$firstImage = true;
+				foreach ($request->file('images') as $image) {
+					$path = $image->store('uploads', 'public');
+					$product->images()->create([
+						'path' => $path,
+						'source_type' => 'local',
+						'is_primary' => $firstImage && $product->images()->count() === 0, // Première image devient principale si aucune autre
+						'sort_order' => (int)(($product->images()->max('sort_order') ?? 0) + 1),
+					]);
+					$firstImage = false;
+				}
+			}
+			
+			\Illuminate\Support\Facades\DB::commit();
+			return redirect()->route('products.show', $product)->with('status', 'Produit créé avec succès');
+		} catch (\Exception $e) {
+			\Illuminate\Support\Facades\DB::rollBack();
+			return back()->withErrors(['error' => 'Erreur lors de la création du produit: ' . $e->getMessage()])->withInput();
+		}
 	}
 
 	public function show(Product $product, Request $request)
@@ -122,8 +166,11 @@ class ProductController extends Controller
 
 	public function edit(Product $product)
 	{
-		$categories = Category::where('type','product')->orderBy('name')->get();
-		return view('products.edit', compact('product', 'categories'));
+		$this->authorize('update', $product);
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_product', 3600, function () {
+            return Category::where('type','product')->orderBy('name')->get();
+        });
+        return view('products.edit', compact('product', 'categories'));
 	}
 
 	public function update(UpdateProductRequest $request, Product $product)

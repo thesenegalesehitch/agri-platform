@@ -101,7 +101,7 @@
 					@php $primaryImage = $item->images->firstWhere('is_primary', 1) ?? $item->images->first(); @endphp
 					<div class="h-48 overflow-hidden rounded-lg mb-4">
 						<img 
-							src="{{ Storage::url($primaryImage->path) }}" 
+							src="{{ $primaryImage->url }}" 
 							loading="lazy"
 							decoding="async"
 							class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
@@ -118,11 +118,32 @@
 				<div>
 					<h3 class="font-bold text-lg mb-2 text-[#5c4033]">{{ $item->title }}</h3>
 					<p class="text-sm text-[#55493f] mb-3 line-clamp-2">{{ Str::limit($item->description, 100) }}</p>
-					<div class="flex justify-between items-center mt-4">
+					@if($item->is_available)
+						<p class="text-xs text-[#4CAF50] mb-2">✓ Disponible</p>
+					@else
+						<p class="text-xs text-red-600 mb-2">✗ Indisponible</p>
+					@endif
+					<div class="flex justify-between items-center gap-2 mt-4">
 						<span class="text-lg font-semibold text-[#4CAF50]">{{ number_format($item->daily_rate * 655.957, 0, ',', ' ') }} FCFA/jour</span>
-						<a href="{{ route('equipment.show',$item) }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-							Voir détails
-						</a>
+						<div class="flex gap-2">
+							@auth
+								@role('buyer')
+									@if($item->is_available)
+										<button 
+											type="button" 
+											class="btn-primary-agri" 
+											style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+											onclick="showRentalModal({{ $item->id }}, '{{ $item->title }}')"
+										>
+											📅 Louer
+										</button>
+									@endif
+								@endrole
+							@endauth
+							<a href="{{ route('equipment.show',$item) }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+								Voir détails
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -233,5 +254,102 @@
 				});
 			}
 		})();
+
+		// Modal pour la location rapide
+		function showRentalModal(equipmentId, equipmentTitle) {
+			const today = new Date().toISOString().split('T')[0];
+			const tomorrow = new Date();
+			tomorrow.setDate(tomorrow.getDate() + 1);
+			const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+			// Récupérer le token CSRF depuis la meta tag
+			const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+
+			const modal = document.createElement('div');
+			modal.id = 'rentalModal';
+			modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+			modal.innerHTML = `
+				<div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-xl font-bold text-[#5c4033]">Louer: ${equipmentTitle}</h3>
+						<button onclick="closeRentalModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+					</div>
+					<form id="quickRentalForm" method="POST" action="/equipment/${equipmentId}/rent">
+						<input type="hidden" name="_token" value="${csrfToken}">
+						<div class="space-y-4">
+							<div>
+								<label for="start_date" class="form-label-agri">Date de début</label>
+								<input 
+									type="date" 
+									id="start_date" 
+									name="start_date" 
+									class="form-input-agri" 
+									value="${today}" 
+									min="${today}" 
+									required
+								>
+							</div>
+							<div>
+								<label for="end_date" class="form-label-agri">Date de fin</label>
+								<input 
+									type="date" 
+									id="end_date" 
+									name="end_date" 
+									class="form-input-agri" 
+									value="${tomorrowStr}" 
+									min="${tomorrowStr}" 
+									required
+								>
+							</div>
+						</div>
+						<div class="flex gap-3 mt-6">
+							<button type="submit" class="btn-primary-agri flex-1">
+								📅 Confirmer la location
+							</button>
+							<button type="button" onclick="closeRentalModal()" class="btn-secondary-agri flex-1">
+								Annuler
+							</button>
+						</div>
+					</form>
+				</div>
+			`;
+			document.body.appendChild(modal);
+
+			// Gestion de la date de fin automatique
+			const startDateInput = modal.querySelector('#start_date');
+			const endDateInput = modal.querySelector('#end_date');
+			
+			startDateInput.addEventListener('change', function() {
+				const startDate = new Date(this.value);
+				const nextDay = new Date(startDate);
+				nextDay.setDate(nextDay.getDate() + 1);
+				endDateInput.min = nextDay.toISOString().split('T')[0];
+				
+				if (endDateInput.value && new Date(endDateInput.value) <= startDate) {
+					endDateInput.value = nextDay.toISOString().split('T')[0];
+				}
+			});
+
+			// Fermer en cliquant à l'extérieur
+			modal.addEventListener('click', function(e) {
+				if (e.target === modal) {
+					closeRentalModal();
+				}
+			});
+		}
+
+		function closeRentalModal() {
+			const modal = document.getElementById('rentalModal');
+			if (modal) {
+				modal.remove();
+			}
+		}
+
+		// Fermer avec Échap
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				closeRentalModal();
+			}
+		});
 	</script>
 </x-app-layout>

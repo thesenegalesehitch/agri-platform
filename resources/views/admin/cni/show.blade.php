@@ -1,11 +1,11 @@
+@php
+	use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
 	<x-slot name="header">
 		<h2 class="page-title-agri">Vérification CNI - {{ $user->name }}</h2>
 	</x-slot>
-
-	@php
-		use Illuminate\Support\Facades\Storage;
-	@endphp
 
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 		<!-- Informations utilisateur -->

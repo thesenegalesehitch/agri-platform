@@ -325,6 +325,13 @@
         </div>
     </nav>
 
+    <!-- Message de succès -->
+    @if(session('status'))
+        <div style="background: #4CAF50; color: white; padding: 1rem; text-align: center; font-weight: 500;">
+            {{ session('status') }}
+        </div>
+    @endif
+
     <!-- 🌻 Hero Section -->
     <section class="hero-section">
         <div class="hero-image-container">

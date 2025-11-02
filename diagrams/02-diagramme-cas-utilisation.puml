@@ -1,0 +1,240 @@
+@startuml Diagramme de Cas d'Utilisation - AgriLink
+
+!define PRIMARY_COLOR #5c4033
+!define SECONDARY_COLOR #4CAF50
+!define TERTIARY_COLOR #d0c9c0
+
+skinparam actor {
+    BackgroundColor #FFF
+    BorderColor PRIMARY_COLOR
+}
+
+skinparam usecase {
+    BackgroundColor<<Buyer>> #E8F5E9
+    BackgroundColor<<Producer>> #FFF3E0
+    BackgroundColor<<EquipmentOwner>> #E3F2FD
+    BackgroundColor<<Admin>> #F3E5F5
+    BackgroundColor<<Public>> #F5F5F5
+    BorderColor PRIMARY_COLOR
+}
+
+skinparam package {
+    BackgroundColor #F9F9F9
+    BorderColor PRIMARY_COLOR
+}
+
+left to right direction
+
+actor "Visiteur" as Visitor
+actor "Acheteur" as Buyer
+actor "Producteur" as Producer
+actor "Propriétaire\nMatériel" as Owner
+actor "Administrateur" as Admin
+
+package "Authentification" {
+    usecase "S'inscrire" as UC1 <<Public>>
+    usecase "Se connecter" as UC2 <<Public>>
+    usecase "Se déconnecter" as UC3 <<Public>>
+    usecase "Réinitialiser mot de passe" as UC4 <<Public>>
+}
+
+package "Gestion Produits" {
+    usecase "Créer un produit" as UC5 <<Producer>>
+    usecase "Modifier un produit" as UC6 <<Producer>>
+    usecase "Supprimer un produit" as UC7 <<Producer>>
+    usecase "Lister mes produits" as UC8 <<Producer>>
+    usecase "Consulter produits" as UC9 <<Public>>
+    usecase "Rechercher produits" as UC10 <<Public>>
+}
+
+package "Gestion Matériels" {
+    usecase "Créer un matériel" as UC11 <<EquipmentOwner>>
+    usecase "Modifier un matériel" as UC12 <<EquipmentOwner>>
+    usecase "Supprimer un matériel" as UC13 <<EquipmentOwner>>
+    usecase "Lister mes matériels" as UC14 <<EquipmentOwner>>
+    usecase "Consulter matériels" as UC15 <<Public>>
+    usecase "Rechercher matériels" as UC16 <<Public>>
+}
+
+package "Gestion Images" {
+    usecase "Uploader images locales" as UC17 <<Producer>> <<EquipmentOwner>>
+    usecase "Ajouter images par URL" as UC18 <<Producer>> <<EquipmentOwner>>
+    usecase "Définir image principale" as UC19 <<Producer>> <<EquipmentOwner>>
+    usecase "Supprimer une image" as UC20 <<Producer>> <<EquipmentOwner>>
+    usecase "Réordonner images" as UC21 <<Producer>> <<EquipmentOwner>>
+}
+
+package "Panier et Commandes" {
+    usecase "Ajouter au panier" as UC22 <<Buyer>>
+    usecase "Voir le panier" as UC23 <<Buyer>>
+    usecase "Retirer du panier" as UC24 <<Buyer>>
+    usecase "Finaliser commande" as UC25 <<Buyer>>
+    usecase "Choisir méthode paiement" as UC26 <<Buyer>>
+    usecase "Payer commande" as UC27 <<Buyer>>
+    usecase "Voir mes commandes" as UC28 <<Buyer>>
+    usecase "Détails commande" as UC29 <<Buyer>>
+    usecase "Demander annulation" as UC30 <<Buyer>>
+}
+
+package "Location Matériel" {
+    usecase "Demander location" as UC31 <<Buyer>> <<Producer>> <<EquipmentOwner>>
+    usecase "Approuver location" as UC32 <<EquipmentOwner>>
+    usecase "Rejeter location" as UC33 <<EquipmentOwner>>
+    usecase "Activer location" as UC34 <<EquipmentOwner>>
+    usecase "Compléter location" as UC35 <<EquipmentOwner>>
+    usecase "Voir mes locations" as UC36 <<EquipmentOwner>>
+    usecase "Voir locations demandées" as UC37 <<Buyer>> <<Producer>>
+}
+
+package "Gestion Utilisateurs" {
+    usecase "Créer utilisateur" as UC38 <<Admin>>
+    usecase "Modifier utilisateur" as UC39 <<Admin>>
+    usecase "Supprimer utilisateur" as UC40 <<Admin>>
+    usecase "Lister utilisateurs" as UC41 <<Admin>>
+    usecase "Suspendre utilisateur" as UC42 <<Admin>>
+    usecase "Réactiver utilisateur" as UC43 <<Admin>>
+    usecase "Modifier profil" as UC44 <<Buyer>> <<Producer>> <<Owner>>
+    usecase "Vérifier CNI" as UC45 <<Admin>>
+    usecase "Approuver CNI" as UC46 <<Admin>>
+    usecase "Rejeter CNI" as UC47 <<Admin>>
+}
+
+package "Gestion Demandes" {
+    usecase "Demander suspension compte" as UC48 <<Buyer>> <<Producer>> <<Owner>>
+    usecase "Approuver suspension" as UC49 <<Admin>>
+    usecase "Rejeter suspension" as UC50 <<Admin>>
+    usecase "Gérer annulations commandes" as UC51 <<Admin>>
+    usecase "Approuver annulation" as UC52 <<Admin>>
+    usecase "Rejeter annulation" as UC53 <<Admin>>
+}
+
+package "Dashboard" {
+    usecase "Voir dashboard" as UC54 <<Buyer>> <<Producer>> <<Owner>> <<Admin>>
+    usecase "Voir statistiques admin" as UC55 <<Admin>>
+}
+
+' Relations Visiteur
+Visitor --> UC1
+Visitor --> UC2
+Visitor --> UC4
+Visitor --> UC9
+Visitor --> UC10
+Visitor --> UC15
+Visitor --> UC16
+
+' Relations Acheteur
+Buyer --> UC3
+Buyer --> UC9
+Buyer --> UC10
+Buyer --> UC15
+Buyer --> UC16
+Buyer --> UC22
+Buyer --> UC23
+Buyer --> UC24
+Buyer --> UC25
+Buyer --> UC26
+Buyer --> UC27
+Buyer --> UC28
+Buyer --> UC29
+Buyer --> UC30
+Buyer --> UC31
+Buyer --> UC37
+Buyer --> UC44
+Buyer --> UC48
+Buyer --> UC54
+
+' Relations Producteur
+Producer --> UC3
+Producer --> UC5
+Producer --> UC6
+Producer --> UC7
+Producer --> UC8
+Producer --> UC9
+Producer --> UC10
+Producer --> UC15
+Producer --> UC16
+Producer --> UC17
+Producer --> UC18
+Producer --> UC19
+Producer --> UC20
+Producer --> UC21
+Producer --> UC31
+Producer --> UC37
+Producer --> UC44
+Producer --> UC48
+Producer --> UC54
+
+' Relations Propriétaire Matériel
+Owner --> UC3
+Owner --> UC11
+Owner --> UC12
+Owner --> UC13
+Owner --> UC14
+Owner --> UC15
+Owner --> UC16
+Owner --> UC17
+Owner --> UC18
+Owner --> UC19
+Owner --> UC20
+Owner --> UC21
+Owner --> UC32
+Owner --> UC33
+Owner --> UC34
+Owner --> UC35
+Owner --> UC36
+Owner --> UC37
+Owner --> UC44
+Owner --> UC48
+Owner --> UC54
+
+' Relations Administrateur
+Admin --> UC3
+Admin --> UC38
+Admin --> UC39
+Admin --> UC40
+Admin --> UC41
+Admin --> UC42
+Admin --> UC43
+Admin --> UC45
+Admin --> UC46
+Admin --> UC47
+Admin --> UC49
+Admin --> UC50
+Admin --> UC51
+Admin --> UC52
+Admin --> UC53
+Admin --> UC54
+Admin --> UC55
+
+note right of Buyer
+  **Permissions Acheteur:**
+  - Gérer panier
+  - Passer commandes
+  - Louer matériel
+  - Voir ses commandes
+end note
+
+note right of Producer
+  **Permissions Producteur:**
+  - CRUD produits
+  - Gérer images
+  - Louer matériel
+end note
+
+note right of Owner
+  **Permissions Propriétaire:**
+  - CRUD matériels
+  - Gérer images
+  - Gérer locations
+end note
+
+note right of Admin
+  **Permissions Admin:**
+  - Gestion complète utilisateurs
+  - Vérification CNI
+  - Gestion suspensions
+  - Validation annulations
+end note
+
+@enduml
+

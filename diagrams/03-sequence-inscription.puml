@@ -1,0 +1,107 @@
+@startuml Diagramme de Séquence - Inscription
+
+!define PRIMARY_COLOR #5c4033
+!define SUCCESS_COLOR #4CAF50
+!define ERROR_COLOR #F44336
+
+skinparam sequence {
+    ArrowColor PRIMARY_COLOR
+    LifeLineBorderColor PRIMARY_COLOR
+    ParticipantBorderColor PRIMARY_COLOR
+    ActorBorderColor PRIMARY_COLOR
+    LifeLineBackgroundColor #FFF
+}
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+actor "Utilisateur" as User
+participant "Navigateur" as Browser
+participant "RegisteredUserController" as Controller
+participant "LoginRequest\n(Validation)" as Validation
+participant "User Model" as UserModel
+participant "Hash\nFacade" as Hash
+participant "Role\nSpatie" as Role
+participant "Event\nRegistered" as Event
+participant "Auth\nFacade" as Auth
+database "Base de\nDonnées" as DB
+
+== Affichage du formulaire ==
+User -> Browser: Accède à /register
+Browser -> Controller: GET /register
+Controller -> Browser: Retourne view('auth.register')
+Browser -> User: Affiche formulaire d'inscription
+
+== Soumission du formulaire ==
+User -> Browser: Remplit et soumet le formulaire
+note right of User
+  Champs requis:
+  - name
+  - email
+  - password
+  - password_confirmation
+  - profile_role (optionnel)
+end note
+
+Browser -> Controller: POST /register\n(avec données)
+
+== Validation ==
+Controller -> Validation: validate()
+Validation -> Validation: Vérifie règles
+note right of Validation
+  Règles:
+  - name: required|string|max:255
+  - email: required|email|unique
+  - password: required|confirmed|min:8
+  - profile_role: nullable|in:buyer,producer,equipment_owner
+end note
+
+alt Validation réussie
+    Validation --> Controller: Retourne données validées
+else Validation échoue
+    Validation --> Browser: Retourne erreurs
+    Browser --> User: Affiche erreurs
+    stop
+end
+
+== Création de l'utilisateur ==
+Controller -> Hash: make(password)
+Hash --> Controller: Password hashé
+
+Controller -> UserModel: create([name, email, password])
+UserModel -> DB: INSERT INTO users
+DB --> UserModel: User créé
+UserModel --> Controller: User instance
+
+== Attribution du rôle ==
+Controller -> Controller: assignRole(profile_role ou 'buyer')
+Controller -> Role: assignRole()
+Role -> DB: INSERT INTO model_has_roles
+DB --> Role: Rôle assigné
+Role --> Controller: Succès
+
+== Événement d'inscription ==
+Controller -> Event: fire(new Registered(user))
+Event -> Event: Dispatch event
+
+== Connexion automatique ==
+Controller -> Auth: login(user)
+Auth -> DB: Créer session
+DB --> Auth: Session créée
+Auth --> Controller: Utilisateur connecté
+
+== Redirection ==
+Controller -> Browser: redirect('/')\nwith('status', 'Compte créé')
+Browser -> User: Redirige vers page d'accueil\nAffiche message de succès
+
+note over User,DB #SUCCESS_COLOR
+  **Résultat:**
+  - Utilisateur créé en base
+  - Rôle assigné (buyer par défaut)
+  - Email automatiquement vérifié
+  - Utilisateur connecté automatiquement
+  - Redirection vers accueil
+end note
+
+@enduml
+
