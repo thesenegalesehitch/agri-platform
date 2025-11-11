@@ -29,7 +29,7 @@ class RentalPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['buyer', 'producer', 'equipment_owner']);
+		return $user->hasRole(['producer', 'admin']);
     }
 
     /**

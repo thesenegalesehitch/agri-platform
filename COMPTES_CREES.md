@@ -38,14 +38,6 @@ Date de génération: 2025-11-01
 
 ---
 
-### 🛒 Acheteurs (1)
-
-| Nom | Email | Rôles | Localisation |
-|-----|-------|-------|--------------|
-| Fatoumata Kamaté Soumaré | fatoumata.kamate@agrilink.com | buyer | Kédougou, Kédougou - Sénégal |
-
----
-
 ### 🔄 Comptes Multi-Rôles (1)
 
 | Nom | Email | Rôles | Localisation |
@@ -60,7 +52,6 @@ Date de génération: 2025-11-01
   - **Alexandre Ndour** (Admin) - Rufisque, Dakar
   - **Djibril Sow** (Équipement) - Thiès
   - **Ibrahima Diallo** (Producteur) - Ziguinchor, Casamance
-  - **Fatoumata Kamaté Soumaré** (Acheteur) - Kédougou
 
 - Les mots de passe par défaut pour les comptes de test sont généralement `password123` ou `Alexandr3` (pour les comptes admin).
 
@@ -69,16 +60,16 @@ Date de génération: 2025-11-01
 ## ✅ Vérification des Fonctionnalités CRUD
 
 ### Producteurs
-- ✅ **Create** : `/products/create` - Créer un produit
-- ✅ **Read** : `/products` - Liste des produits (ses propres produits)
-- ✅ **Update** : `/products/{id}/edit` - Modifier un produit
-- ✅ **Delete** : `/products/{id}` - Supprimer un produit (via formulaire DELETE)
+- ✅ **Read** : `/equipment` - Rechercher des équipements disponibles
+- ✅ **Create** : `/equipment/{id}/rent` - Demander une location
+- ✅ **Read** : `/rentals` - Suivre ses demandes de location
 
 ### Propriétaires de Matériel
 - ✅ **Create** : `/equipment/create` - Créer un équipement
 - ✅ **Read** : `/equipment` - Liste des équipements (ses propres équipements)
 - ✅ **Update** : `/equipment/{id}/edit` - Modifier un équipement
 - ✅ **Delete** : `/equipment/{id}` - Supprimer un équipement (via formulaire DELETE)
+- ✅ **Update** : `/rentals/{id}` - Gérer le statut des demandes de location
 
 ### Fonctionnalités Images
 - ✅ Upload local jusqu'à 10 images

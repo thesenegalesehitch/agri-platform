@@ -240,16 +240,6 @@
         </div>
 
         <!-- Champs spécifiques selon le rôle -->
-        @role('buyer')
-        <div class="border-t border-[#d0c9c0] pt-6 mt-6">
-            <h3 class="section-title-agri mb-4">💳 Facturation (Acheteur)</h3>
-            <div class="form-group">
-                <x-input-label for="billing_vat_number" value="N° TVA (optionnel)" />
-                <x-text-input id="billing_vat_number" name="billing_vat_number" type="text" :value="old('billing_vat_number', $user->billing_vat_number)" />
-            </div>
-        </div>
-        @endrole
-
         @role('producer')
         <div class="border-t border-[#d0c9c0] pt-6 mt-6">
             <h3 class="section-title-agri mb-4">🌾 Exploitant (Producteur)</h3>

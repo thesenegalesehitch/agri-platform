@@ -13,26 +13,6 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Catégories de produits
-        $productCategories = [
-            'Fruits',
-            'Légumes',
-            'Aromates',
-            'Céréales',
-            'Semences',
-            'Engrais',
-        ];
-        
-        foreach ($productCategories as $name) {
-            Category::firstOrCreate([
-                'slug' => str($name)->slug(),
-                'type' => 'product',
-            ], [
-                'name' => $name,
-                'type' => 'product',
-            ]);
-        }
-
         // Catégories de matériels par fonction
         $equipmentCategories = [
             'Travail du Sol',

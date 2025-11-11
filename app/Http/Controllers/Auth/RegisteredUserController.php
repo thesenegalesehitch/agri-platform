@@ -33,8 +33,8 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            // profile_role is optional; default to 'buyer' when not provided (keeps backward compatibility with tests)
-            'profile_role' => ['nullable','in:buyer,producer,equipment_owner'],
+            // profile_role is optional; default to 'producer' when not provided
+            'profile_role' => ['nullable','in:producer,equipment_owner'],
         ]);
 
         $user = User::create([
@@ -43,8 +43,8 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-    // Assign selected role (but never admin). Default to 'buyer' when not provided.
-    $user->assignRole($request->input('profile_role', 'buyer'));
+    // Assign selected role (but never admin). Default to 'producer' when not provided.
+    $user->assignRole($request->input('profile_role', 'producer'));
 
         event(new Registered($user));
 

@@ -28,7 +28,7 @@ class UserManagementController extends Controller
 
     public function create()
     {
-        $roles = Role::pluck('name')->toArray();
+        $roles = Role::whereIn('name', ['producer','equipment_owner','admin'])->pluck('name')->toArray();
         return view('admin.users.create', compact('roles'));
     }
 
@@ -38,7 +38,7 @@ class UserManagementController extends Controller
             'name' => ['required','string','max:255'],
             'email' => ['required','email','max:255','unique:users,email'],
             'password' => ['required','string','min:8','confirmed'],
-            'role' => ['required','in:buyer,producer,equipment_owner,admin'],
+            'role' => ['required','in:producer,equipment_owner,admin'],
         ]);
 
         $user = User::create([
@@ -58,7 +58,7 @@ class UserManagementController extends Controller
 
     public function edit(User $user)
     {
-        $roles = Role::pluck('name')->toArray();
+        $roles = Role::whereIn('name', ['producer','equipment_owner','admin'])->pluck('name')->toArray();
         return view('admin.users.edit', compact('user','roles'));
     }
 
@@ -67,7 +67,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => ['required','string','max:255'],
             'email' => ['required','email','max:255','unique:users,email,'.$user->id],
-            'role' => ['required','in:buyer,producer,equipment_owner,admin'],
+            'role' => ['required','in:producer,equipment_owner,admin'],
             'password' => ['nullable','string','min:8','confirmed'],
             'is_suspended' => ['sometimes','boolean'],
         ]);

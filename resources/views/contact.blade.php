@@ -12,7 +12,7 @@
                     Contactez-nous
                 </h2>
                 <p class="text-[#55493f] mb-6">
-                    Notre équipe est à votre disposition pour répondre à toutes vos questions sur Agri-Platform Sénégal.
+                    Notre équipe est à votre disposition pour répondre à toutes vos questions sur AgriLink Sénégal.
                 </p>
 
                 <div class="space-y-4">
@@ -119,13 +119,13 @@
                 </div>
 
                 <div class="border-l-4 border-[#4CAF50] pl-4">
-                    <h4 class="font-semibold text-[#5c4033] mb-2">Comment ajouter un produit ?</h4>
-                    <p class="text-[#55493f] text-sm">Connectez-vous à votre compte producteur et utilisez le bouton "Nouveau" dans la section Produits.</p>
+                    <h4 class="font-semibold text-[#5c4033] mb-2">Comment louer un équipement ?</h4>
+                    <p class="text-[#55493f] text-sm">Parcourez les équipements disponibles et cliquez sur "Demander une location" pour le matériel souhaité.</p>
                 </div>
 
                 <div class="border-l-4 border-[#4CAF50] pl-4">
-                    <h4 class="font-semibold text-[#5c4033] mb-2">Comment louer un équipement ?</h4>
-                    <p class="text-[#55493f] text-sm">Parcourez les équipements disponibles et cliquez sur "Demander une location" pour le matériel souhaité.</p>
+                    <h4 class="font-semibold text-[#5c4033] mb-2">Comment proposer mon matériel ?</h4>
+                    <p class="text-[#55493f] text-sm">Connectez-vous à votre espace propriétaire et ajoutez un nouveau matériel avec ses caractéristiques et tarifs.</p>
                 </div>
             </div>
 

@@ -45,8 +45,6 @@ class AppServiceProvider extends ServiceProvider
                 null => 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1600&q=80',
                 'welcome' => 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1600&q=80',
                 'dashboard' => 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80',
-                'products.index' => 'https://images.unsplash.com/photo-1542831371-d531d36971e6?auto=format&fit=crop&w=1600&q=80',
-                'products.show' => 'https://images.unsplash.com/photo-1505577058444-a3dab40a5b57?auto=format&fit=crop&w=1600&q=80',
                 'equipment.index' => 'https://images.unsplash.com/photo-1500504902414-2f1b1d5d3f2a?auto=format&fit=crop&w=1600&q=80',
                 'equipment.show' => 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80',
                 'admin.dashboard' => 'https://images.unsplash.com/photo-1526318472351-c75fcf070f8d?auto=format&fit=crop&w=1600&q=80',

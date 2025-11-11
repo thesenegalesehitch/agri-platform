@@ -9,9 +9,6 @@
                     </a>
                 </div>
                 <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('products.index')" :active="request()->is('products*')" class="text-white hover:text-green-300">
-                        Produits
-                    </x-nav-link>
                     <x-nav-link :href="route('equipment.index')" :active="request()->is('equipment*')" class="text-white hover:text-green-300">
                         Équipements
                     </x-nav-link>
@@ -20,8 +17,8 @@
                             Dashboard
                         </x-nav-link>
                         @role('producer')
-                            <x-nav-link :href="route('products.index')" :active="request()->is('products*')" class="text-white hover:text-green-300">
-                                Mes Produits
+                            <x-nav-link :href="route('rentals.index')" :active="request()->is('rentals*')" class="text-white hover:text-green-300">
+                                Mes Locations
                             </x-nav-link>
                         @endrole
                         @role('equipment_owner')
@@ -29,15 +26,7 @@
                                 Mes Matériels
                             </x-nav-link>
                             <x-nav-link :href="route('rentals.index')" :active="request()->is('rentals*')" class="text-white hover:text-green-300">
-                                Locations
-                            </x-nav-link>
-                        @endrole
-                        @role('buyer')
-                            <x-nav-link :href="route('orders.index')" :active="request()->is('orders*')" class="text-white hover:text-green-300">
-                                Commandes
-                            </x-nav-link>
-                            <x-nav-link :href="route('cart.index')" :active="request()->is('cart')" class="text-white hover:text-green-300">
-                                Panier
+                                Demandes de location
                             </x-nav-link>
                         @endrole
                         @role('admin')

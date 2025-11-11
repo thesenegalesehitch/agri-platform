@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Equipment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,38 +9,6 @@ use Illuminate\Http\JsonResponse;
 
 class SearchController extends Controller
 {
-    /**
-     * Autocomplétion pour les produits
-     */
-    public function autocompleteProducts(Request $request): JsonResponse
-    {
-        $query = $request->input('q', '');
-        
-        if (strlen($query) < 2) {
-            return response()->json([]);
-        }
-
-        $results = Product::where('is_active', true)
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%'.$query.'%')
-                  ->orWhere('description', 'like', '%'.$query.'%');
-            })
-            ->with('category')
-            ->limit(10)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'title' => $product->title,
-                    'category' => $product->category?->name,
-                    'price' => $product->price,
-                    'url' => route('products.show', $product),
-                ];
-            });
-
-        return response()->json($results);
-    }
-
     /**
      * Autocomplétion pour les équipements
      */

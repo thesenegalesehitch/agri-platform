@@ -341,7 +341,7 @@
 			@endrole
 
 			@auth
-				@role('buyer')
+				@role('producer')
 					<div class="border-t border-[#d0c9c0] pt-6 mt-6">
 						<h3 class="section-title-agri">Demander une Location</h3>
 						<form method="POST" action="{{ route('rentals.store', $equipment) }}" class="space-y-4" id="rentalForm">

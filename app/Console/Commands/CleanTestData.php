@@ -4,9 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
-use App\Models\Product;
 use App\Models\Equipment;
-use App\Models\Order;
 use App\Models\Rental;
 use App\Models\Image;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +24,7 @@ class CleanTestData extends Command
      *
      * @var string
      */
-    protected $description = 'Supprime toutes les données de test (utilisateurs, produits, équipements, commandes, locations)';
+    protected $description = 'Supprime toutes les données de test (utilisateurs, équipements, locations)';
 
     /**
      * Liste des emails de test à supprimer (ou patterns)
@@ -95,31 +93,6 @@ class CleanTestData extends Command
 
             $this->info("📋 {$testUsers->count()} utilisateur(s) de test trouvé(s)");
 
-            // Supprimer les produits de test
-            $testProductIds = Product::whereIn('user_id', $testUsers->pluck('id'))->pluck('id');
-            if ($testProductIds->isNotEmpty()) {
-                // Supprimer les images des produits
-                $productImages = Image::where('imageable_type', Product::class)
-                    ->whereIn('imageable_id', $testProductIds)
-                    ->get();
-                
-                foreach ($productImages as $image) {
-                    if (Storage::exists($image->path)) {
-                        Storage::delete($image->path);
-                    }
-                    $image->delete();
-                }
-                
-                // Supprimer les items de commande liés
-                DB::table('order_items')
-                    ->whereIn('product_id', $testProductIds)
-                    ->delete();
-                
-                // Supprimer les produits
-                Product::whereIn('id', $testProductIds)->delete();
-                $this->info("✅ {$testProductIds->count()} produit(s) supprimé(s)");
-            }
-
             // Supprimer les équipements de test
             $testEquipmentIds = Equipment::whereIn('user_id', $testUsers->pluck('id'))->pluck('id');
             if ($testEquipmentIds->isNotEmpty()) {
@@ -141,19 +114,6 @@ class CleanTestData extends Command
                 // Supprimer les équipements
                 Equipment::whereIn('id', $testEquipmentIds)->delete();
                 $this->info("✅ {$testEquipmentIds->count()} équipement(s) supprimé(s)");
-            }
-
-            // Supprimer les commandes de test
-            $testOrderIds = Order::whereIn('buyer_id', $testUsers->pluck('id'))->pluck('id');
-            if ($testOrderIds->isNotEmpty()) {
-                // Supprimer les items de commande
-                DB::table('order_items')
-                    ->whereIn('order_id', $testOrderIds)
-                    ->delete();
-                
-                // Supprimer les commandes
-                Order::whereIn('id', $testOrderIds)->delete();
-                $this->info("✅ {$testOrderIds->count()} commande(s) supprimée(s)");
             }
 
             // Supprimer les locations de test

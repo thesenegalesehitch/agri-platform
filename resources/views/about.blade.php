@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="page-title-agri">À propos d'Agri-Platform</h2>
+        <h2 class="page-title-agri">À propos d'AgriLink</h2>
     </x-slot>
 
     <div class="space-y-6">
@@ -28,7 +28,7 @@
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <p class="text-[#55493f] mb-4 leading-relaxed">
-                        Agri-Platform Sénégal est née en 2023 d'une vision simple : connecter les agriculteurs modernes du Sénégal avec les technologies qui peuvent transformer leur quotidien. Fondée par une équipe d'experts passionnés par l'agriculture durable, notre plateforme est le fruit de plusieurs années d'expérience sur le terrain.
+                        AgriLink Sénégal est née en 2023 d'une vision simple : connecter les agriculteurs modernes du Sénégal avec les technologies qui peuvent transformer leur quotidien. Fondée par une équipe d'experts passionnés par l'agriculture durable, notre plateforme est le fruit de plusieurs années d'expérience sur le terrain.
                     </p>
                     <p class="text-[#55493f] mb-4 leading-relaxed">
                         Nous avons constaté que malgré les avancées technologiques mondiales, de nombreux agriculteurs sénégalais peinaient à accéder aux outils modernes qui pourraient révolutionner leur productivité. C'est cette lacune que nous avons décidé de combler.
@@ -43,7 +43,7 @@
                         </li>
                         <li class="flex items-center">
                             <span class="w-2 h-2 bg-[#4CAF50] rounded-full mr-3"></span>
-                            <strong>1000+</strong> produits commercialisés
+                            <strong>1000+</strong> locations réalisées
                         </li>
                         <li class="flex items-center">
                             <span class="w-2 h-2 bg-[#4CAF50] rounded-full mr-3"></span>
@@ -125,7 +125,7 @@
             </h2>
             <div class="bg-[#f8f6f3] p-6 rounded-lg">
                 <p class="text-[#55493f] mb-4 leading-relaxed">
-                    Depuis notre lancement, Agri-Platform Sénégal a contribué à transformer l'écosystème agricole sénégalais en :
+                    Depuis notre lancement, AgriLink Sénégal a contribué à transformer l'écosystème agricole sénégalais en :
                 </p>
                 <ul class="space-y-3 text-[#55493f]">
                     <li class="flex items-start">
@@ -134,7 +134,7 @@
                     </li>
                     <li class="flex items-start">
                         <span class="text-[#4CAF50] mr-3 mt-1">✓</span>
-                        <span><strong>Réduction du gaspillage</strong> : Notre plateforme a permis de réduire le gaspillage alimentaire de 40% en connectant directement producteurs et consommateurs.</span>
+                        <span><strong>Optimisation des ressources</strong> : En mutualisant les matériels disponibles, nous réduisons les périodes d'inactivité et maximisons l'utilisation des équipements.</span>
                     </li>
                     <li class="flex items-start">
                         <span class="text-[#4CAF50] mr-3 mt-1">✓</span>

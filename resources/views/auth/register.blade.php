@@ -26,9 +26,8 @@
             <x-input-label for="profile_role" value="Profil" />
             <select id="profile_role" name="profile_role" class="form-select-agri block mt-1 w-full">
                 <option value="">-- Sélectionnez votre profil --</option>
-                <option value="buyer" {{ old('profile_role')==='buyer'?'selected':'' }}>Acheteur - Acheter des produits agricoles</option>
-                <option value="producer" {{ old('profile_role')==='producer'?'selected':'' }}>Producteur - Vendre vos produits agricoles</option>
-                <option value="equipment_owner" {{ old('profile_role')==='equipment_owner'?'selected':'' }}>Propriétaire de matériel - Louer vos équipements agricoles</option>
+                <option value="producer" {{ old('profile_role')==='producer'?'selected':'' }}>Producteur - Louer des matériels agricoles</option>
+                <option value="equipment_owner" {{ old('profile_role')==='equipment_owner'?'selected':'' }}>Propriétaire de matériel - Mettre vos équipements en location</option>
             </select>
             <x-input-error :messages="$errors->get('profile_role')" class="mt-2" />
         </div>

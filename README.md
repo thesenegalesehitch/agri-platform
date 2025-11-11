@@ -1,4 +1,4 @@
-Agri Platform - Gestion et Échange de Produits et Matériels Agricoles
+Agri Platform - Location de Matériels Agricoles
 
 Prérequis
 - PHP 8.3+, Composer, Node.js 18+
@@ -13,7 +13,6 @@ Installation (local sans Docker)
 
 Comptes de test
 - admin@example.com / password
-- buyer@example.com / password
 - producer@example.com / password
 - owner@example.com / password
 
@@ -25,12 +24,11 @@ Docker (dev) avec Sail
 Docker (prod) rapide
 1. docker compose -f docker-compose.prod.yml up -d --build
 
-Fonctionnalités principales (plan)
+Fonctionnalités principales
 - Auth multi-rôles (Sanctum + Spatie Permissions)
 - Dashboards par rôle (Blade + Tailwind)
-- Produits & Matériels: CRUD, images, catégories, recherche
-- Achats (panier, commande, paiement fictif)
-- Locations (disponibilités, réservation, calendrier)
+- Matériels agricoles : gestion, images, catégories, recherche
+- Locations (disponibilités, réservation, notifications)
 - Notifications & requêtes de réactivation
 - API REST + Swagger (L5-Swagger)
 - Tests (Pest) + CI GitHub Actions

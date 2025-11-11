@@ -12,7 +12,7 @@ class StoreRentalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check() && (Auth::user()->hasRole('buyer') || Auth::user()->hasRole('producer') || Auth::user()->hasRole('equipment_owner'));
+		return Auth::check() && (Auth::user()->hasRole('producer') || Auth::user()->hasRole('admin'));
     }
 
     /**

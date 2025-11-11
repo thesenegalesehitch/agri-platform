@@ -127,7 +127,7 @@
 						<span class="text-lg font-semibold text-[#4CAF50]">{{ number_format($item->daily_rate * 655.957, 0, ',', ' ') }} FCFA/jour</span>
 						<div class="flex gap-2">
 							@auth
-								@role('buyer')
+								@role('producer')
 									@if($item->is_available)
 										<button 
 											type="button" 

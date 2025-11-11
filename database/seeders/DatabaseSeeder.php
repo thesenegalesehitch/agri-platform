@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             RolesAndTestDataSeeder::class,
             TestAccountsSeeder::class,
             CategorySeeder::class,
-            ProductAndEquipmentSeeder::class,
+            EquipmentSeeder::class,
         ]);
     }
 }

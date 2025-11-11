@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Agri-Platform') }}</title>
+    <title>{{ config('app.name', 'AgriLink') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -305,7 +305,6 @@
                 <span>AgriLink</span>
             </a>
             <div class="nav-links">
-                <a href="{{ route('products.index') }}" class="nav-link">Produits</a>
                 <a href="{{ route('equipment.index') }}" class="nav-link">Équipements</a>
                 <a href="{{ route('about') }}" class="nav-link">À propos</a>
                 <a href="{{ route('contact') }}" class="nav-link">Contact</a>
@@ -347,12 +346,11 @@
             >
             <div class="hero-overlay">
                 <h1 class="hero-title">Bienvenue sur AgriLink</h1>
-                <p class="hero-subtitle">La plateforme agricole moderne qui connecte producteurs, acheteurs et propriétaires d'équipements au Sénégal.</p>
+                <p class="hero-subtitle">La plateforme agricole qui connecte producteurs et propriétaires d'équipements pour faciliter la location de matériel au Sénégal.</p>
                 <div class="hero-buttons">
-                    <a href="{{ route('products.index') }}" class="hero-btn hero-btn-primary">Découvrir les Produits</a>
-                    <a href="{{ route('equipment.index') }}" class="hero-btn hero-btn-secondary">Voir les Équipements</a>
+                    <a href="{{ route('equipment.index') }}" class="hero-btn hero-btn-primary">Découvrir les Équipements</a>
                     @auth
-                        <a href="{{ route('dashboard') }}" class="hero-btn hero-btn-primary">Mon Dashboard</a>
+                        <a href="{{ route('dashboard') }}" class="hero-btn hero-btn-secondary">Mon Dashboard</a>
                     @else
                         <a href="{{ route('register') }}" class="hero-btn hero-btn-secondary">Créer un Compte</a>
                     @endauth
@@ -400,21 +398,21 @@
         <div class="section-container">
             <h2 class="section-title">Nos Services</h2>
             <div class="action-buttons">
-                <a href="{{ route('products.index') }}" class="action-button">
-                    <span class="action-icon">🌾</span>
-                    <div class="action-title">Produits Agricoles</div>
-                    <div class="action-desc">Découvrez une large gamme de produits frais directement des producteurs locaux.</div>
-                </a>
                 <a href="{{ route('equipment.index') }}" class="action-button">
                     <span class="action-icon">🚜</span>
                     <div class="action-title">Location d'Équipements</div>
                     <div class="action-desc">Accédez à du matériel agricole moderne sans investir dans l'achat.</div>
                 </a>
+                <a href="{{ route('support') }}" class="action-button">
+                    <span class="action-icon">🤝</span>
+                    <div class="action-title">Accompagnement</div>
+                    <div class="action-desc">Bénéficiez d'un support dédié pour organiser vos locations et répondre à vos questions.</div>
+                </a>
                 @auth
                     <a href="{{ route('dashboard') }}" class="action-button">
                         <span class="action-icon">📊</span>
                         <div class="action-title">Tableau de Bord</div>
-                        <div class="action-desc">Gérez vos produits, équipements et transactions en toute simplicité.</div>
+                        <div class="action-desc">Suivez vos locations et gérez vos équipements en toute simplicité.</div>
                     </a>
                 @else
                     <a href="{{ route('register') }}" class="action-button">

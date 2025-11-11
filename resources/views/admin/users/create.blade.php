@@ -41,7 +41,6 @@
 			<div class="form-group">
 				<label for="role" class="form-label-agri">Rôle *</label>
 				<select id="role" name="role" class="form-select-agri" required>
-					<option value="buyer" {{ old('role') == 'buyer' ? 'selected' : '' }}>Acheteur</option>
 					<option value="producer" {{ old('role') == 'producer' ? 'selected' : '' }}>Producteur</option>
 					<option value="equipment_owner" {{ old('role') == 'equipment_owner' ? 'selected' : '' }}>Propriétaire matériel</option>
 					<option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>

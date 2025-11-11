@@ -16,9 +16,8 @@ class RolesAndTestDataSeeder extends Seeder
     {
         $roles = [
             'admin' => 'Administrateur - Accès complet à la plateforme',
-            'buyer' => 'Acheteur - Peut acheter des produits agricoles',
-            'producer' => 'Producteur - Peut vendre des produits agricoles',
-            'equipment_owner' => 'Propriétaire d\'équipement - Peut louer des équipements agricoles',
+            'producer' => 'Producteur - Peut louer des équipements agricoles',
+            'equipment_owner' => 'Propriétaire d\'équipement - Peut proposer ses matériels à la location',
         ];
 
         foreach ($roles as $roleName => $description) {
@@ -48,20 +47,6 @@ class RolesAndTestDataSeeder extends Seeder
         }
 
         // Create sample users with detailed profiles
-        $buyer = User::firstOrCreate(
-            ['email' => 'buyer@agri-platform.com'],
-            [
-                'name' => 'Ahmed Diop',
-                'password' => bcrypt('buyer123'),
-                'phone' => '+221 77 234 56 78',
-                'address_line1' => 'Thiès, Sénégal',
-                'billing_vat_number' => 'SN987654321'
-            ]
-        );
-        if (!$buyer->hasRole('buyer')) {
-            $buyer->assignRole('buyer');
-        }
-
         $producer = User::firstOrCreate(
             ['email' => 'producer@agri-platform.com'],
             [

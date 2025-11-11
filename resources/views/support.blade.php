@@ -54,28 +54,28 @@
                 @php
                     $faqs = [
                         [
-                            'q' => 'Comment créer un compte sur Agri-Platform ?',
-                            'a' => 'Pour créer un compte, cliquez sur "Créer un compte" en haut à droite de la page d\'accueil. Remplissez le formulaire avec vos informations personnelles, votre rôle (producteur, acheteur, ou propriétaire d\'équipement), et validez votre email.'
-                        ],
-                        [
-                            'q' => 'Comment ajouter un produit à vendre ?',
-                            'a' => 'Connectez-vous à votre compte producteur, allez dans "Mes Produits", cliquez sur "Nouveau". Remplissez les informations de votre produit (nom, description, prix, catégorie) et ajoutez des photos de qualité.'
+                            'q' => 'Comment créer un compte sur AgriLink ?',
+                            'a' => 'Pour créer un compte, cliquez sur "Créer un compte" en haut à droite de la page d\'accueil. Choisissez votre rôle (producteur ou propriétaire d\'équipement), complétez vos informations, puis validez votre email.'
                         ],
                         [
                             'q' => 'Comment louer un équipement agricole ?',
-                            'a' => 'Parcourez les équipements disponibles, sélectionnez celui qui vous intéresse, et cliquez sur "Demander une location". Choisissez vos dates de location et soumettez votre demande.'
+                            'a' => 'Connectez-vous en tant que producteur, parcourez les équipements disponibles et cliquez sur "Demander une location". Sélectionnez vos dates et confirmez votre demande.'
+                        ],
+                        [
+                            'q' => 'Comment mettre mon équipement en location ?',
+                            'a' => 'Depuis votre compte propriétaire d\'équipement, rendez-vous dans "Mes matériels" puis "Nouveau matériel". Ajoutez une description détaillée, des photos et définissez le tarif journalier.'
+                        ],
+                        [
+                            'q' => 'Comment suivre l\'état de mes demandes ?',
+                            'a' => 'Accédez à la rubrique "Mes locations" pour suivre l\'état de vos demandes (en attente, approuvées, rejetées) et consulter les détails de chaque réservation.'
                         ],
                         [
                             'q' => 'Quels sont les frais de commission ?',
-                            'a' => 'Nous appliquons une commission de 5% sur chaque transaction réussie. Cette commission nous permet de maintenir et améliorer la plateforme pour tous les utilisateurs.'
-                        ],
-                        [
-                            'q' => 'Comment modifier mes informations personnelles ?',
-                            'a' => 'Allez dans votre profil en cliquant sur votre nom en haut à droite, puis sélectionnez "Profil". Vous pourrez modifier vos informations personnelles, votre mot de passe, et vos préférences.'
+                            'a' => 'Une commission de 5% est appliquée sur chaque location finalisée. Elle finance la maintenance et l\'amélioration continue de la plateforme.'
                         ],
                         [
                             'q' => 'Les paiements sont-ils sécurisés ?',
-                            'a' => 'Oui, tous les paiements sont traités via des systèmes de paiement sécurisés certifiés. Nous utilisons le chiffrement SSL et respectons les normes de sécurité les plus élevées.'
+                            'a' => 'Oui, tous les paiements sont traités via des systèmes de paiement certifiés et sécurisés. Nous utilisons le chiffrement SSL et respectons les normes de sécurité les plus élevées.'
                         ],
                     ];
                 @endphp
@@ -106,10 +106,10 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @php
                     $guides = [
-                        ['icon' => '👤', 'title' => 'Guide du Débutant', 'desc' => 'Apprenez les bases d\'Agri-Platform en 5 minutes'],
-                        ['icon' => '📦', 'title' => 'Vendre ses Produits', 'desc' => 'Comment créer et gérer vos annonces de produits'],
-                        ['icon' => '🚜', 'title' => 'Louer son Équipement', 'desc' => 'Guide complet pour louer vos équipements agricoles'],
-                        ['icon' => '🛒', 'title' => 'Acheter en Ligne', 'desc' => 'Comment passer commande et suivre vos achats'],
+                        ['icon' => '👤', 'title' => 'Guide du Débutant', 'desc' => 'Apprenez les bases d\'AgriLink en quelques minutes'],
+                        ['icon' => '🚜', 'title' => 'Mettre son Matériel en Location', 'desc' => 'Guide complet pour référencer vos équipements agricoles'],
+                        ['icon' => '📅', 'title' => 'Préparer une Demande de Location', 'desc' => 'Les bonnes pratiques pour réserver un matériel en toute sérénité'],
+                        ['icon' => '💼', 'title' => 'Gérer ses Demandes', 'desc' => 'Suivre et organiser vos demandes de location reçues'],
                         ['icon' => '💳', 'title' => 'Paiements Sécurisés', 'desc' => 'Comprendre notre système de paiement sécurisé'],
                         ['icon' => '📊', 'title' => 'Tableau de Bord', 'desc' => 'Utiliser efficacement votre espace personnel'],
                     ];

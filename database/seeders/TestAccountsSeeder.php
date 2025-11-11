@@ -16,7 +16,7 @@ class TestAccountsSeeder extends Seeder
         $this->command->info('🌱 Création des comptes de test...');
 
         // Assurer que tous les rôles existent
-        $roles = ['admin', 'buyer', 'producer', 'equipment_owner'];
+        $roles = ['admin', 'producer', 'equipment_owner'];
         foreach ($roles as $roleName) {
             Role::firstOrCreate(['name' => $roleName]);
         }
@@ -43,30 +43,6 @@ class TestAccountsSeeder extends Seeder
             $admin->assignRole('admin');
         }
         $this->command->info('✅ Admin créé : admin@test.com / admin123');
-
-        // Acheteur (Buyer)
-        $buyer = User::updateOrCreate(
-            ['email' => 'buyer@test.com'],
-            [
-                'name' => 'Acheteur Test',
-                'password' => bcrypt('buyer123'),
-                'phone' => '+221 77 000 00 02',
-                'phone_verified' => true,
-                'region' => 'Thiès',
-                'ville' => 'Thiès',
-                'address_line1' => 'Thiès, Sénégal',
-                'country' => 'Sénégal',
-                'billing_vat_number' => 'SN123456789',
-                'cni_verified' => true,
-                'cni_verified_at' => now(),
-                'is_suspended' => false,
-                'email_verified_at' => now(),
-            ]
-        );
-        if (!$buyer->hasRole('buyer')) {
-            $buyer->assignRole('buyer');
-        }
-        $this->command->info('✅ Acheteur créé : buyer@test.com / buyer123');
 
         // Producteur (Producer)
         $producer = User::updateOrCreate(
@@ -120,29 +96,6 @@ class TestAccountsSeeder extends Seeder
         $this->command->info('✅ Propriétaire matériel créé : owner@test.com / owner123');
 
         // Comptes supplémentaires pour plus de flexibilité
-        // Acheteur 2
-        $buyer2 = User::updateOrCreate(
-            ['email' => 'acheteur@test.com'],
-            [
-                'name' => 'Acheteur 2 Test',
-                'password' => bcrypt('acheteur123'),
-                'phone' => '+221 77 000 00 05',
-                'phone_verified' => true,
-                'region' => 'Ziguinchor',
-                'ville' => 'Ziguinchor',
-                'address_line1' => 'Ziguinchor, Sénégal',
-                'country' => 'Sénégal',
-                'cni_verified' => true,
-                'cni_verified_at' => now(),
-                'is_suspended' => false,
-                'email_verified_at' => now(),
-            ]
-        );
-        if (!$buyer2->hasRole('buyer')) {
-            $buyer2->assignRole('buyer');
-        }
-        $this->command->info('✅ Acheteur 2 créé : acheteur@test.com / acheteur123');
-
         // Producteur 2
         $producer2 = User::updateOrCreate(
             ['email' => 'producteur@test.com'],
@@ -202,10 +155,6 @@ class TestAccountsSeeder extends Seeder
         $this->command->info('👤 ADMIN');
         $this->command->info('   Email: admin@test.com');
         $this->command->info('   Mot de passe: admin123');
-        $this->command->info('');
-        $this->command->info('🛒 ACHETEURS');
-        $this->command->info('   Email: buyer@test.com → Mot de passe: buyer123');
-        $this->command->info('   Email: acheteur@test.com → Mot de passe: acheteur123');
         $this->command->info('');
         $this->command->info('🌾 PRODUCTEURS');
         $this->command->info('   Email: producer@test.com → Mot de passe: producer123');

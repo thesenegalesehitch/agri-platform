@@ -2,12 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\EquipmentController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\SuspensionRequestController;
-use App\Http\Controllers\CartController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\Admin\UserManagementController;
 
@@ -16,39 +13,22 @@ Route::get('/about', function () { return view('about'); })->name('about');
 Route::get('/contact', function () { return view('contact'); })->name('contact');
 Route::get('/support', function () { return view('support'); })->name('support');
 
-// Routes publiques pour voir les produits et équipements
-Route::get('products', [ProductController::class, 'index'])->name('products.index');
+// Route publique pour voir les équipements
 Route::get('equipment', [EquipmentController::class, 'index'])->name('equipment.index');
 
 // IMPORTANT: Les routes avec paramètres ({product}, {equipment}) doivent être définies 
 // APRÈS toutes les routes spécifiques (create, edit) pour éviter les conflits de matching
 // Ajout de contraintes pour exclure "create" et "edit" des valeurs possibles
-Route::get('products/{product}', [ProductController::class, 'show'])
-    ->where('product', '^(?!create|edit).*')
-    ->name('products.show');
 Route::get('equipment/{equipment}', [EquipmentController::class, 'show'])
     ->where('equipment', '^(?!create|edit).*')
     ->name('equipment.show');
 
 // Routes d'autocomplétion (publiques)
-Route::get('api/search/products', [\App\Http\Controllers\SearchController::class, 'autocompleteProducts'])->name('api.search.products');
 Route::get('api/search/equipment', [\App\Http\Controllers\SearchController::class, 'autocompleteEquipment'])->name('api.search.equipment');
 Route::get('api/search/locations', [\App\Http\Controllers\SearchController::class, 'autocompleteLocations'])->name('api.search.locations');
 
 Route::middleware(['auth', 'suspended'])->group(function () {
 	Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-	// Producer - IMPORTANT: définir create/edit AVANT les routes show avec paramètres
-	Route::middleware('role:producer')->group(function () {
-		// Définir create et edit explicitement pour éviter les conflits avec products/{product}
-		// Utiliser ->name() APRÈS ->middleware() pour s'assurer que la route est bien nommée
-		Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
-		Route::post('products', [ProductController::class, 'store'])->name('products.store');
-		Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-		Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-		Route::patch('products/{product}', [ProductController::class, 'update']);
-		Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-	});
 
 	// Equipment owner - IMPORTANT: définir create/edit AVANT les routes show avec paramètres
 	Route::middleware('role:equipment_owner')->group(function () {
@@ -59,24 +39,18 @@ Route::middleware(['auth', 'suspended'])->group(function () {
 		Route::put('equipment/{equipment}', [EquipmentController::class, 'update'])->name('equipment.update');
 		Route::patch('equipment/{equipment}', [EquipmentController::class, 'update']);
 		Route::delete('equipment/{equipment}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
-		
-		Route::resource('rentals', RentalController::class)->only(['index','show','update']);
+
+		Route::patch('rentals/{rental}', [RentalController::class, 'update'])->name('rentals.update');
+		Route::put('rentals/{rental}', [RentalController::class, 'update']);
 	});
 
-	// Buyer
-	Route::middleware('role:buyer')->group(function () {
-		Route::get('cart', [CartController::class, 'index'])->name('cart.index');
-		Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-		Route::post('cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
-		Route::post('checkout', [CartController::class, 'checkout'])->name('cart.checkout');
-		Route::get('orders/{order}/payment', [CartController::class, 'showPayment'])->name('cart.payment');
-		Route::post('orders/{order}/payment', [CartController::class, 'processPayment'])->name('cart.payment.process');
-		Route::resource('orders', OrderController::class)->only(['index','show']);
-		Route::post('orders/{order}/cancel', [OrderController::class, 'requestCancellation'])->name('orders.cancel.request');
-	});
+	Route::get('rentals', [RentalController::class, 'index'])->name('rentals.index');
+	Route::get('rentals/{rental}', [RentalController::class, 'show'])->name('rentals.show');
 
-	// Rentals for buyers (request booking)
-	Route::post('equipment/{equipment}/rent', [RentalController::class, 'store'])->name('rentals.store');
+	// Demandes de location (producers)
+	Route::post('equipment/{equipment}/rent', [RentalController::class, 'store'])
+		->middleware('role:producer')
+		->name('rentals.store');
 
 	// Images upload/delete/reorder (owner only)
 	Route::post('images', [ImageController::class, 'store'])->name('images.store');
@@ -113,11 +87,6 @@ Route::middleware(['auth', 'suspended'])->group(function () {
 		Route::patch('/admin/suspension-requests/{suspensionRequest}/approve', [SuspensionRequestController::class, 'approve'])->name('admin.suspensions.approve');
 		Route::patch('/admin/suspension-requests/{suspensionRequest}/reject', [SuspensionRequestController::class, 'reject'])->name('admin.suspensions.reject');
 		
-		// Gestion des demandes d'annulation de commandes
-		Route::get('/admin/orders/cancellations', [\App\Http\Controllers\Admin\OrderCancellationController::class, 'index'])->name('admin.orders.cancellations.index');
-		Route::get('/admin/orders/cancellations/{order}', [\App\Http\Controllers\Admin\OrderCancellationController::class, 'show'])->name('admin.orders.cancellations.show');
-		Route::post('/admin/orders/cancellations/{order}/approve', [\App\Http\Controllers\Admin\OrderCancellationController::class, 'approve'])->name('admin.orders.cancellations.approve');
-		Route::post('/admin/orders/cancellations/{order}/reject', [\App\Http\Controllers\Admin\OrderCancellationController::class, 'reject'])->name('admin.orders.cancellations.reject');
 	});
 });
 

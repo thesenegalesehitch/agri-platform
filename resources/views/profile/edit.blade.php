@@ -31,11 +31,11 @@
 
             @role('producer')
             <div class="content-card fade-in">
-                <h3 class="section-title-agri">Espace Producteur</h3>
-                <p class="text-sm text-[#55493f] mb-3">Gérer vos produits et votre stock.</p>
+				<h3 class="section-title-agri">Espace Producteur</h3>
+				<p class="text-sm text-[#55493f] mb-3">Accédez aux matériels disponibles et suivez vos demandes de location.</p>
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('products.index') }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mes produits</a>
-                    <a href="{{ route('products.create') }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Nouveau produit</a>
+					<a href="{{ route('equipment.index') }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Voir les matériels</a>
+					<a href="{{ route('rentals.index') }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mes locations</a>
                 </div>
             </div>
             @endrole
@@ -48,17 +48,6 @@
                     <a href="{{ route('equipment.index') }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mes matériels</a>
                     <a href="{{ route('equipment.create') }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Nouveau matériel</a>
                     <a href="{{ route('rentals.index') }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mes locations</a>
-                </div>
-            </div>
-            @endrole
-
-            @role('buyer')
-            <div class="content-card fade-in">
-                <h3 class="section-title-agri">Espace Acheteur</h3>
-                <p class="text-sm text-[#55493f] mb-3">Voir vos commandes et votre panier.</p>
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('orders.index') }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mes commandes</a>
-                    <a href="{{ route('cart.index') }}" class="btn-secondary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Mon panier</a>
                 </div>
             </div>
             @endrole
