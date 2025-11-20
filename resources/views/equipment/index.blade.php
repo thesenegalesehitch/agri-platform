@@ -124,7 +124,7 @@
 						<p class="text-xs text-red-600 mb-2">✗ Indisponible</p>
 					@endif
 					<div class="flex justify-between items-center gap-2 mt-4">
-						<span class="text-lg font-semibold text-[#4CAF50]">{{ number_format($item->daily_rate * 655.957, 0, ',', ' ') }} FCFA/jour</span>
+						<span class="text-lg font-semibold text-[#4CAF50]">{{ number_format($item->daily_rate, 0, ',', ' ') }} FCFA/jour</span>
 						<div class="flex gap-2">
 							@auth
 								@role('producer')

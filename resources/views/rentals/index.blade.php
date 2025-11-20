@@ -49,7 +49,7 @@
 										{{ ucfirst($rental->status) }}
 									</span>
 								</td>
-								<td class="font-semibold text-[#4CAF50]">{{ number_format($rental->total * 655.957, 0, ',', ' ') }} FCFA</td>
+								<td class="font-semibold text-[#4CAF50]">{{ number_format($rental->total, 0, ',', ' ') }} FCFA</td>
 								<td>
 									<a href="{{ route('rentals.show', $rental) }}" class="btn-primary-agri" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
 										Voir détails

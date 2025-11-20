@@ -80,7 +80,7 @@
 						<div class="flex items-start">
 							<span class="font-semibold text-[#5c4033] w-40">Tarif journalier:</span>
 							<span class="text-[#4CAF50] font-bold text-xl flex-1">
-								{{ number_format($equipment->daily_rate * 655.957, 0, ',', ' ') }} FCFA
+								{{ number_format($equipment->daily_rate, 0, ',', ' ') }} FCFA
 								@if($equipment->pricing_unit)
 									<span class="text-sm text-[#55493f] font-normal">
 										/ @if($equipment->pricing_unit === 'per_hour') heure
